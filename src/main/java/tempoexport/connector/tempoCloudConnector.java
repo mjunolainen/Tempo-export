@@ -13,7 +13,7 @@ import tempoexport.dto.WorkLogDto;
 
 @Slf4j
 @Component
-public class tempoCloudConnector {
+public class TempoCloudConnector {
 
 
     @Autowired
@@ -25,7 +25,7 @@ public class tempoCloudConnector {
     @Value("${tempo.token}")
     private String token;
 
-    public workLogDto getWorklogs() {
+    public WorkLogDto getWorklogs() {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -39,8 +39,4 @@ public class tempoCloudConnector {
             throw new RuntimeException("Status code exception ", sce);
         }
     }
-
-
-
 }
-

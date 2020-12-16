@@ -14,7 +14,7 @@ public class tempoExportService {
     private TempoCloudConnector tempoCloudConnector;
 
     public void tempoData() {
-      WorkLogDto dto = tempoCloudConnector.getWorklogs();
-      log.info("Count {}", dto.getMetaData().getCount());
+        WorkLogDto dto = tempoCloudConnector.getWorklogs();
+        log.info("Count {}", dto.getMetaData().getCount());
     }
 }

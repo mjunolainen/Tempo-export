@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class workLogDto {
+public class WorkLogDto {
 
     @JsonProperty("metadata")
-    metaDataDto metaData;
+    MetaDataDto metaData;
     String self;
 }
-
