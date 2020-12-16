@@ -8,7 +8,7 @@ import tempoexport.dto.WorkLogDto;
 
 @Slf4j
 @Service
-public class tempoExportService {
+public class TempoExportService {
 
     @Autowired
     private TempoCloudConnector tempoCloudConnector;
