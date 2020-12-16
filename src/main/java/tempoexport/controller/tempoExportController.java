@@ -1,14 +1,13 @@
-package Tempoexport.controller;
+package tempoexport.controller;
 
-import Tempoexport.service.TempoExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TempoExportController {
+public class tempoExportController {
     @Autowired
-    private TempoExportService tempoExportService;
+    private tempoexport.service.tempoExportService tempoExportService;
 
     @GetMapping("tempoData")
     public void getTempoData() {

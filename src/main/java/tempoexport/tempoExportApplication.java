@@ -1,13 +1,13 @@
-package Tempoexport;
+package tempoexport;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TempoExportApplication {
+public class tempoExportApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TempoExportApplication.class, args);
+        SpringApplication.run(tempoExportApplication.class, args);
     }
 
 }
