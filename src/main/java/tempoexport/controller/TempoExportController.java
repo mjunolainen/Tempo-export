@@ -14,4 +14,10 @@ public class TempoExportController {
     public void getTempoData() {
         tempoExportService.tempoData();
     }
+
+    @GetMapping("tempoCloudAccounts")
+    public void getTempoCloudAccounts() {
+        tempoExportService.tempoCloudAccounts();
+    }
+
 }
