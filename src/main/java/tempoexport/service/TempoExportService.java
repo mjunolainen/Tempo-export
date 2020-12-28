@@ -24,5 +24,6 @@ public class TempoExportService {
     public void tempoCloudAccounts() {
         TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
         log.info("Count {}", dto.getMetaData().getCount());
+        log.info("Results {}", dto.getResults());
     }
 }
