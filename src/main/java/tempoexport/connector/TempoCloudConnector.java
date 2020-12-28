@@ -16,7 +16,6 @@ import tempoexport.dto.WorkLogDto;
 @Component
 public class TempoCloudConnector {
 
-
     @Autowired
     private RestTemplate restTemplate;
 
@@ -25,6 +24,7 @@ public class TempoCloudConnector {
 
     @Value("${tempo.token}")
     private String token;
+
 
     public WorkLogDto getWorklogs() {
         try {
@@ -70,4 +70,5 @@ public class TempoCloudConnector {
             throw new RuntimeException("Status code exception ", sce);
         }
     }
+
 }

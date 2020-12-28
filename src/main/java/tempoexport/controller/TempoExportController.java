@@ -25,4 +25,10 @@ public class TempoExportController {
         tempoExportService.tempoCloudTeams();
     }
 
+    @GetMapping("tempoServerTeams")
+    public void getTempoServerTeams() {
+        tempoExportService.tempoServerTeams();
+    }
+
+
 }
