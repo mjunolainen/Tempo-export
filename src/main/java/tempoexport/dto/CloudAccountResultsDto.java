@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class CloudResultsDto {
+public class CloudAccountResultsDto {
 
     String self;
     String key;
@@ -13,7 +13,7 @@ public class CloudResultsDto {
     String status;
     boolean global;
     @JsonProperty("lead")
-    CloudResultsLeadDto cloudResultsLeadDto;
+    CloudAccountResultsLeadDto cloudAccountResultsLeadDto;
     @JsonProperty("links")
-    CloudResultsLinksDto cloudResultsLinksDto;
+    CloudAccountResultsLinksDto cloudAccountResultsLinksDto;
 }
