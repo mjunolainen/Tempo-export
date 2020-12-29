@@ -15,7 +15,6 @@ public class TempoCloudAccountDto {
     @JsonProperty("results")
     List<CloudAccountResultsDto> results = null;
 
-    //
-    @JsonProperty("links")
-    CloudAccountResultsLinksDto links;
+    //@JsonProperty("links")
+    //CloudAccountResultsLinksDto links;
 }
