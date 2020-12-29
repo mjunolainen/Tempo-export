@@ -14,6 +14,9 @@ public class CloudAccountResultsDto {
     boolean global;
     @JsonProperty("lead")
     CloudAccountResultsLeadDto cloudAccountResultsLeadDto;
+    @JsonProperty("customer")
+    CloudAccountResultsCustomerDto cloudAccountResultsCustomerDto;
     @JsonProperty("links")
     CloudAccountResultsLinksDto cloudAccountResultsLinksDto;
+
 }
