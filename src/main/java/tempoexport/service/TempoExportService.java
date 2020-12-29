@@ -33,6 +33,9 @@ public class TempoExportService {
         //TODO cloud DTO ja server DTO vastavusse
         //TODO kirje serverisse
 
+        dto.forEach{ Object elem ->
+            //do something
+        }
         /*for (int i = 0; i < dto.getMetaData().getCount(); i++) {
 
         }*/
