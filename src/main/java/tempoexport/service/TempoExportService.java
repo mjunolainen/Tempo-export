@@ -17,10 +17,13 @@ public class TempoExportService {
     public void tempoData() {
         WorkLogDto dto = tempoCloudConnector.getWorklogs();
         log.info("Count {}", dto.getMetaData().getCount());
+        log.info("Offset {}", dto.getMetaData().getOffset());
+        log.info("Limit {}", dto.getMetaData().getLimit());
     }
 
     public void tempoCloudAccounts() {
         TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
         log.info("Count {}", dto.getMetaData().getCount());
+        log.info("Results {}", dto.getResults());
     }
 }

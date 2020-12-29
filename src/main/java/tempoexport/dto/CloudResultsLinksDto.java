@@ -3,7 +3,7 @@ package tempoexport.dto;
 import lombok.Data;
 
 @Data
-public class CloudMetaDataDto {
+public class CloudResultsLinksDto {
 
-    Integer count;
+    String self;
 }
