@@ -30,9 +30,7 @@ public class TempoExportService {
         TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
         log.info("Count {}", dto.getMetaData().getCount());
         log.info("Results {}", dto.getResults());
-        //log.info(String.valueOf(dto.getLinks()));
     }
-
 
     public void tempoCloudTeams() {
         TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
@@ -40,7 +38,7 @@ public class TempoExportService {
     }
 
     public void tempoServerTeams() {
-        TempoServerTeamDto dto = tempoServerConnector.getTempoServerTeams();
-        log.info(String.valueOf(dto.getResults()));
+        TempoServerTeamDto[] dto = tempoServerConnector.getTempoServerTeams();
+        log.info(String.valueOf(dto.length));
     }
 }

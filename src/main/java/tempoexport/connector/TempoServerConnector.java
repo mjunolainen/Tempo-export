@@ -25,16 +25,15 @@ public class TempoServerConnector {
     @Value("${tempo.passwordServer}")
     private String passwordServer;
 
-    public TempoServerTeamDto getTempoServerTeams() {
+    public TempoServerTeamDto[] getTempoServerTeams() {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBasicAuth(usernameServer, passwordServer);
             HttpEntity httpEntity = new HttpEntity(null, headers);
-            ResponseEntity<TempoServerTeamDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.GET, httpEntity, TempoServerTeamDto.class);
+            ResponseEntity<TempoServerTeamDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.GET, httpEntity, TempoServerTeamDto[].class);
             return usage.getBody();
-        }
-        catch (HttpStatusCodeException sce) {
+        } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
             throw new RuntimeException("Status code exception ", sce);
         }
