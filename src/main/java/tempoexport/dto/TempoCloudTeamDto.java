@@ -6,16 +6,12 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TempoCloudAccountDto {
+public class TempoCloudTeamDto {
 
     @JsonProperty("metadata")
     CloudMetaDataDto metaData;
     String self;
 
     @JsonProperty("results")
-    List<CloudAccountResultsDto> results = null;
-
-    //
-    @JsonProperty("links")
-    CloudAccountResultsLinksDto links;
+    List<CloudTeamResultsDto> results = null;
 }

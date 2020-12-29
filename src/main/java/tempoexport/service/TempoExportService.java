@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
-import tempoexport.dto.TempoCloudAccountDto;
-import tempoexport.dto.WorkLogDto;
+import tempoexport.dto.*;
 
 @Slf4j
 @Service
@@ -25,5 +24,12 @@ public class TempoExportService {
         TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
         log.info("Count {}", dto.getMetaData().getCount());
         log.info("Results {}", dto.getResults());
+        //log.info(String.valueOf(dto.getLinks()));
+    }
+
+
+    public void tempoCloudTeams() {
+        TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
+        log.info(String.valueOf(dto.getResults()));
     }
 }
