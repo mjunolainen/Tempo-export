@@ -27,6 +27,17 @@ public class TempoExportService {
         TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
         log.info("Count {}", dto.getMetaData().getCount());
         log.info("Results {}", dto.getResults());
+
+        //TODO for loop, mis käib läbi listi kõik osad või Iterator?
+        //TODO kirje listis TempoCloudAccountDto
+        //TODO cloud DTO ja server DTO vastavusse
+        //TODO kirje serverisse
+
+        /*for (int i = 0; i < dto.getMetaData().getCount(); i++) {
+
+        }*/
+
+
     }
 
     public void tempoCloudTeams() {
