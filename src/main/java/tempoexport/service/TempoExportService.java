@@ -1,6 +1,7 @@
 package tempoexport.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
@@ -32,13 +33,15 @@ public class TempoExportService {
         //TODO kirje listis TempoCloudAccountDto
         //TODO cloud DTO ja server DTO vastavusse
         //TODO kirje serverisse
-
-        dto.forEach{ Object elem ->
-            //do something
+        if (dto.getResults() != null){
+          for (CloudAccountResultsDto cloudAccountResultsDto: dto.getResults()) {
+            ServerAccountDto insertDto = new ServerAccountDto();
+            BeanUtils.copyProperties(cloudAccountResultsDto, insertDto);
+            log.info("insertDto key {}", insertDto.getKey());
+            ServerAccountInsertResponseDto responseDto = tempoServerConnector.insertAccount(insertDto);
+            log.info("response object for post {}", responseDto.toString());
+          }
         }
-        /*for (int i = 0; i < dto.getMetaData().getCount(); i++) {
-
-        }*/
 
 
     }
