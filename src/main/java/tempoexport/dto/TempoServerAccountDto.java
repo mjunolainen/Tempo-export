@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TempoServerTeamDto {
+public class TempoServerAccountDto {
     @JsonProperty("results")
-    List<ServerTeamResultsDto> results = null;
+    List<ServerAccountResultsDto> results = null;
 }
