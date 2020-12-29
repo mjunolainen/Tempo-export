@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.dto.*;
+import tempoexport.connector.TempoServerConnector;
 
 @Slf4j
 @Service
@@ -12,6 +13,8 @@ public class TempoExportService {
 
     @Autowired
     private TempoCloudConnector tempoCloudConnector;
+    @Autowired
+    private TempoServerConnector tempoServerConnector;
 
     public void tempoData() {
         WorkLogDto dto = tempoCloudConnector.getWorklogs();
@@ -24,12 +27,20 @@ public class TempoExportService {
         TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
         log.info("Count {}", dto.getMetaData().getCount());
         log.info("Results {}", dto.getResults());
-        //log.info(String.valueOf(dto.getLinks()));
     }
-
 
     public void tempoCloudTeams() {
         TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
         log.info(String.valueOf(dto.getResults()));
+    }
+
+    public void tempoServerTeams() {
+        TempoServerTeamDto[] dto = tempoServerConnector.getTempoServerTeams();
+        log.info(String.valueOf(dto.length));
+    }
+
+    public void tempoServerAccounts() {
+        TempoServerAccountDto[] dto = tempoServerConnector.getTempoServerAccounts();
+        log.info(String.valueOf(dto.length));
     }
 }
