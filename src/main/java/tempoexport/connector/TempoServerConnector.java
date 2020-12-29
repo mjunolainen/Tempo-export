@@ -7,6 +7,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import tempoexport.dto.TempoServerAccountDto;
 import tempoexport.dto.TempoServerTeamDto;
 
 @Slf4j
@@ -40,4 +41,17 @@ public class TempoServerConnector {
     }
 
 
+    public TempoServerAccountDto[] getTempoServerAccounts() {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBasicAuth(usernameServer, passwordServer);
+            HttpEntity httpEntity = new HttpEntity(null, headers);
+            ResponseEntity<TempoServerAccountDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.GET, httpEntity, TempoServerAccountDto[].class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
 }
