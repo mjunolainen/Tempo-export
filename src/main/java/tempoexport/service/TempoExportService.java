@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.dto.*;
 import tempoexport.connector.TempoServerConnector;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +44,9 @@ public class TempoExportService {
                 // cloud displayName = server username,
                 // get displayName --> jiraServerUserKey() --> leia displayName vastav key
 
+                String cloudDisplayName = cloudAccountResultsDto.getCloudAccountResultsLeadDto().getDisplayName();
+                // jiraServerUserKey(); --> cloudDisplayName --> search HashMap
+
                 log.info("insertDto key {}", insertDto.getKey());
                 ServerAccountInsertResponseDto responseDto = tempoServerConnector.insertAccount(insertDto);
                 log.info("response object for post {}", responseDto.toString());
@@ -74,6 +78,8 @@ public class TempoExportService {
                 paramMap.put(userDto.getDisplayName(), userDto);
             }
             log.info(String.valueOf(paramMap));
+            log.info(String.valueOf(dto.length));
+
         }
     }
 
@@ -88,8 +94,6 @@ public class TempoExportService {
             log.info(String.valueOf(paramMap));
         }
     }
-
-
 
 
 }
