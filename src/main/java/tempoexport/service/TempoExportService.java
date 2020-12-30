@@ -4,21 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.dto.*;
 import tempoexport.connector.TempoServerConnector;
-
 import java.util.HashMap;
 import java.util.Map;
-
 
 @Slf4j
 @Service
 public class TempoExportService {
 
-    @Autowired
-    private RestTemplate restTemplate;
     @Autowired
     private TempoCloudConnector tempoCloudConnector;
     @Autowired
@@ -39,7 +34,15 @@ public class TempoExportService {
         if (dto.getResults() != null) {
             for (CloudAccountResultsDto cloudAccountResultsDto : dto.getResults()) {
                 ServerAccountDto insertDto = new ServerAccountDto();
+
                 BeanUtils.copyProperties(cloudAccountResultsDto, insertDto);
+
+                //.copyProperties võtab ainult ühilduvad kaasa? key-key, name-name ja status-status
+                //TODO insertDto: contact --> tühi {key: {}, username:{}}, JiraServerUserDto
+                //TODO insertDto: lead --> JiraServerUserDto
+                // cloud displayName = server username,
+                // get displayName --> jiraServerUserKey() --> leia displayName vastav key
+
                 log.info("insertDto key {}", insertDto.getKey());
                 ServerAccountInsertResponseDto responseDto = tempoServerConnector.insertAccount(insertDto);
                 log.info("response object for post {}", responseDto.toString());
@@ -64,16 +67,29 @@ public class TempoExportService {
 
     public void jiraServerUsers() {
         JiraServerUserResultsDto[] dto = tempoServerConnector.getJiraServerUsers();
-        log.info("Results {}", dto.length);
+        Map<String, Object> paramMap = new HashMap<>();
 
         if (dto.length > 0) {
-            for (JiraServerUserResultsDto dtoHashMap : dto) {
-                //log.info(dtoHashMap.getKey());
-                Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("key", dtoHashMap.getKey());
-                log.info(String.valueOf(paramMap));
+            for (JiraServerUserResultsDto userDto : dto) {
+                paramMap.put(userDto.getDisplayName(), userDto);
             }
-
+            log.info(String.valueOf(paramMap));
         }
     }
+
+    public void jiraServerUserKey() {
+        JiraServerUserResultsDto[] dto = tempoServerConnector.getJiraServerUsers();
+        Map<String, String> paramMap = new HashMap<>();
+
+        if (dto.length > 0) {
+            for (JiraServerUserResultsDto userKeyDto : dto) {
+                paramMap.put(userKeyDto.getDisplayName(), userKeyDto.getKey());
+            }
+            log.info(String.valueOf(paramMap));
+        }
+    }
+
+
+
+
 }
