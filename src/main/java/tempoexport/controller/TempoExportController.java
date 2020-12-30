@@ -34,4 +34,9 @@ public class TempoExportController {
     public void getTempoServerAccounts() {
         tempoExportService.tempoServerAccounts();
     }
+
+    @GetMapping("jiraServerUsers")
+    public void getJiraServerUsers() {
+        tempoExportService.jiraServerUsers();
+    }
 }

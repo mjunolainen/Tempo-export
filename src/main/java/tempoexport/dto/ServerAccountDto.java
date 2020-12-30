@@ -3,7 +3,7 @@ package tempoexport.dto;
 import lombok.Data;
 
 @Data
-public class ServerAccountDto {
+public class  ServerAccountDto {
 
   String key;
   String name;
