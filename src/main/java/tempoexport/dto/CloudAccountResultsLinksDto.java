@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class CloudAccountResultsLinksDto {
 
-     String self;
+    String self;
 }

@@ -34,8 +34,7 @@ public class TempoCloudConnector {
             HttpEntity httpEntity = new HttpEntity<>(null, headers);
             ResponseEntity<WorkLogDto> usage = restTemplate.exchange(tempoCloudUrl + "/worklogs", HttpMethod.GET, httpEntity, WorkLogDto.class);
             return usage.getBody();
-        }
-        catch (HttpStatusCodeException sce) {
+        } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
             throw new RuntimeException("Status code exception ", sce);
         }
@@ -49,8 +48,7 @@ public class TempoCloudConnector {
             HttpEntity httpEntity = new HttpEntity(null, headers);
             ResponseEntity<TempoCloudAccountDto> usage = restTemplate.exchange(tempoCloudUrl + "/accounts", HttpMethod.GET, httpEntity, TempoCloudAccountDto.class);
             return usage.getBody();
-        }
-        catch (HttpStatusCodeException sce) {
+        } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
             throw new RuntimeException("Status code exception ", sce);
         }
@@ -64,8 +62,7 @@ public class TempoCloudConnector {
             HttpEntity httpEntity = new HttpEntity(null, headers);
             ResponseEntity<TempoCloudTeamDto> usage = restTemplate.exchange(tempoCloudUrl + "/teams", HttpMethod.GET, httpEntity, TempoCloudTeamDto.class);
             return usage.getBody();
-        }
-        catch (HttpStatusCodeException sce) {
+        } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
             throw new RuntimeException("Status code exception ", sce);
         }

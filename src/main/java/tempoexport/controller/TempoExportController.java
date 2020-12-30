@@ -3,45 +3,43 @@ package tempoexport.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tempoexport.service.TempoExportService;
+import tempoexport.service.TempoAccountsService;
+import tempoexport.service.TempoTeamsService;
 
 @RestController
 public class TempoExportController {
     @Autowired
-    private TempoExportService tempoExportService;
+    private TempoAccountsService tempoAccountsService;
+    @Autowired
+    private TempoTeamsService tempoTeamsService;
 
-    @GetMapping("tempoData")
-    public void getTempoData() {
-        tempoExportService.tempoData();
-    }
-
-    @GetMapping("tempoCloudAccounts")
-    public void getTempoCloudAccounts() {
-        tempoExportService.tempoCloudAccounts();
-    }
-
-    @GetMapping("tempoCloudTeams")
-    public void getTempoCloudTeams() {
-        tempoExportService.tempoCloudTeams();
-    }
-
-    @GetMapping("tempoServerTeams")
-    public void getTempoServerTeams() {
-        tempoExportService.tempoServerTeams();
+    @GetMapping("migrateTempoAccounts")
+    public void getMigrateTempoAccounts() {
+        tempoAccountsService.migrateTempoAccounts();
     }
 
     @GetMapping("tempoServerAccounts")
     public void getTempoServerAccounts() {
-        tempoExportService.tempoServerAccounts();
+        tempoAccountsService.tempoServerAccounts();
     }
 
-    @GetMapping("jiraServerUsers")
-    public void getJiraServerUsers() {
-        tempoExportService.jiraServerUsers();
+    @GetMapping("jiraServerUserMap")
+    public void getJiraServerUserMap() {
+        tempoAccountsService.jiraServerUserMap();
     }
 
-    @GetMapping("jiraServerUserKey")
-    public void getJiraServerUserKey() {
-        tempoExportService.jiraServerUserKey();
+    @GetMapping("tempoCloudTeams")
+    public void getTempoCloudTeams() {
+        tempoTeamsService.tempoCloudTeams();
+    }
+
+    @GetMapping("tempoServerTeams")
+    public void getTempoServerTeams() {
+        tempoTeamsService.tempoServerTeams();
+    }
+
+    @GetMapping("tempoData")
+    public void getTempoData() {
+        tempoAccountsService.tempoData();
     }
 }
