@@ -9,4 +9,3 @@ public class CloudAccountResultsLeadDto {
     String accountId;
     String displayName;
 }
-

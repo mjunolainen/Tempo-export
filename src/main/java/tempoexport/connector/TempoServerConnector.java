@@ -58,7 +58,7 @@ public class TempoServerConnector {
 
   public JiraServerUserResultsDto[] getJiraServerUsers() {
     try {
-      ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0", HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
+      ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=1000", HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
       return usage.getBody();
     } catch (HttpStatusCodeException sce) {
       log.error("Status Code exception {}", sce);
