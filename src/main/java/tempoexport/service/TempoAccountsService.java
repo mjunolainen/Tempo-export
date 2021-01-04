@@ -71,7 +71,6 @@ public class TempoAccountsService {
             for (JiraServerUserResultsDto userKeyDto : dto) {
                 paramMap.put(userKeyDto.getDisplayName(), userKeyDto);
             }
-            //log.info(String.valueOf(paramMap));
         }
         return paramMap;
     }

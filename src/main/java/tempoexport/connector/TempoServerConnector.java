@@ -7,8 +7,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import tempoexport.dto.*;
 
 @Slf4j
@@ -48,10 +46,9 @@ public class TempoServerConnector {
         }
     }
 
-    public TempoServerAccountDto deleteTempoServerAccounts(Integer accountId) {
+    public void deleteTempoServerAccounts(Integer accountId) {
         try {
-            ResponseEntity<TempoServerAccountDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{id}", HttpMethod.DELETE, getEntity(), TempoServerAccountDto.class, accountId);
-            return usage.getBody();
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{id}", HttpMethod.DELETE, getEntity(), void.class, accountId);
         } catch (HttpStatusCodeException sce) {
             throw new RuntimeException("Status code exception ", sce);
         }
@@ -94,12 +91,5 @@ public class TempoServerConnector {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(usernameServer, passwordServer);
         return headers;
-    }
-
-    private HttpEntity getEntityAccountId(Integer accountId) {
-        HttpHeaders headers = getHeaders();
-
-        HttpEntity httpEntity = new HttpEntity(accountId, headers);
-        return httpEntity;
     }
 }
