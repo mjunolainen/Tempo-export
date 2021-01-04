@@ -84,8 +84,7 @@ public class TempoAccountsService {
         TempoServerAccountDto[] dto = tempoServerConnector.getTempoServerAccounts();
         for (int i = 0; i < dto.length; i++) {
             TempoServerAccountDto dtoAccount = dto[i];
-            Integer accountId = dtoAccount.getId();
-            tempoServerConnector.deleteTempoServerAccounts(accountId);
+            tempoServerConnector.deleteTempoServerAccounts(dtoAccount.getId());
         }
     }
 
