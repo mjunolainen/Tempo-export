@@ -7,6 +7,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import tempoexport.dto.*;
 
 @Slf4j
@@ -46,6 +48,15 @@ public class TempoServerConnector {
         }
     }
 
+    public TempoServerAccountDto deleteTempoServerAccounts(Integer accountId) {
+        try {
+            ResponseEntity<TempoServerAccountDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{id}", HttpMethod.DELETE, getEntity(), TempoServerAccountDto.class, accountId);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
     public ServerAccountInsertResponseDto insertAccount(ServerAccountDto insertAccount) {
         try {
             ResponseEntity<ServerAccountInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.POST, getEntityAccount(insertAccount), ServerAccountInsertResponseDto.class);
@@ -56,15 +67,15 @@ public class TempoServerConnector {
         }
     }
 
-  public JiraServerUserResultsDto[] getJiraServerUsers() {
-    try {
-      ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=1000", HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
-      return usage.getBody();
-    } catch (HttpStatusCodeException sce) {
-      log.error("Status Code exception {}", sce);
-      throw new RuntimeException("Status code exception ", sce);
+    public JiraServerUserResultsDto[] getJiraServerUsers() {
+        try {
+            ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=1000", HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
     }
-  }
 
     private HttpEntity getEntityAccount(ServerAccountDto account) {
         HttpHeaders headers = getHeaders();
@@ -83,5 +94,12 @@ public class TempoServerConnector {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(usernameServer, passwordServer);
         return headers;
+    }
+
+    private HttpEntity getEntityAccountId(Integer accountId) {
+        HttpHeaders headers = getHeaders();
+
+        HttpEntity httpEntity = new HttpEntity(accountId, headers);
+        return httpEntity;
     }
 }

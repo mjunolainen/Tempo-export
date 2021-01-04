@@ -23,6 +23,11 @@ public class TempoExportController {
         tempoAccountsService.tempoServerAccounts();
     }
 
+    @GetMapping("deleteServerAccounts")
+    public void deleteTempoServerAccounts() {
+    tempoAccountsService.deleteTempoServerAccounts();
+    }
+
     @GetMapping("jiraServerUserMap")
     public void getJiraServerUserMap() {
         tempoAccountsService.jiraServerUserMap();

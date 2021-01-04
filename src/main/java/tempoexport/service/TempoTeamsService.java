@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.connector.TempoServerConnector;
+import tempoexport.dto.CloudTeamResultsDto;
+import tempoexport.dto.ServerTeamResultsDto;
 import tempoexport.dto.TempoCloudTeamDto;
 import tempoexport.dto.TempoServerTeamDto;
 
@@ -18,6 +20,15 @@ public class TempoTeamsService {
     @Autowired
     private TempoServerConnector tempoServerConnector;
 
+
+    public void migrateTempoTeams() {
+        TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
+        if (dto.getResults() != null) {
+            for (CloudTeamResultsDto cloudTeamResultsDto : dto.getResults()) {
+
+            }
+        }
+    }
 
     public void tempoCloudTeams() {
         TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
