@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class  ServerAccountDto {
 
-  @JsonProperty("jiraServerContact")
+  @JsonProperty("contact")
   JiraServerUserDto jiraServerContact;
   String key;
-  @JsonProperty("jiraServerLead")
+  @JsonProperty("lead")
   JiraServerUserDto jiraServerLead;
   String name;
   String status;

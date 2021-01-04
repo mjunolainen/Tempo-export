@@ -49,8 +49,8 @@ public class TempoAccountsService {
                 //log.info("insertDto name {}", insertDto.getName());
                 //log.info("insertDto status {}", insertDto.getStatus());
 
-                ServerAccountInsertResponseDto responseDto = tempoServerConnector.insertAccount(insertDto);
-                log.info("response object for post {}", responseDto.toString());
+                tempoServerConnector.insertAccount(insertDto);
+                //log.info("response object for post {}", responseDto.toString());
             }
         }
     }

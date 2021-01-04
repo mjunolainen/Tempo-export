@@ -14,9 +14,7 @@ public class TempoExportController {
     private TempoTeamsService tempoTeamsService;
 
     @GetMapping("migrateTempoAccounts")
-    public void getMigrateTempoAccounts() {
-        tempoAccountsService.migrateTempoAccounts();
-    }
+    public void getMigrateTempoAccounts() { tempoAccountsService.migrateTempoAccounts(); }
 
     @GetMapping("tempoServerAccounts")
     public void getTempoServerAccounts() {
