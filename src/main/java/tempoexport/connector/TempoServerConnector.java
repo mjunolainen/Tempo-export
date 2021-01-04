@@ -46,6 +46,14 @@ public class TempoServerConnector {
         }
     }
 
+    public void deleteTempoServerAccounts(Integer accountId) {
+        try {
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{id}", HttpMethod.DELETE, getEntity(), void.class, accountId);
+        } catch (HttpStatusCodeException sce) {
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
     public ServerAccountInsertResponseDto insertAccount(ServerAccountDto insertAccount) {
         try {
             ResponseEntity<ServerAccountInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.POST, getEntityAccount(insertAccount), ServerAccountInsertResponseDto.class);
@@ -56,15 +64,15 @@ public class TempoServerConnector {
         }
     }
 
-  public JiraServerUserResultsDto[] getJiraServerUsers() {
-    try {
-      ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=1000", HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
-      return usage.getBody();
-    } catch (HttpStatusCodeException sce) {
-      log.error("Status Code exception {}", sce);
-      throw new RuntimeException("Status code exception ", sce);
+    public JiraServerUserResultsDto[] getJiraServerUsers() {
+        try {
+            ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=1000", HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
     }
-  }
 
     private HttpEntity getEntityAccount(ServerAccountDto account) {
         HttpHeaders headers = getHeaders();

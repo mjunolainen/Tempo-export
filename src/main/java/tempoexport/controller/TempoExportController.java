@@ -14,14 +14,15 @@ public class TempoExportController {
     private TempoTeamsService tempoTeamsService;
 
     @GetMapping("migrateTempoAccounts")
-    public void getMigrateTempoAccounts() {
-        tempoAccountsService.migrateTempoAccounts();
-    }
+    public void getMigrateTempoAccounts() { tempoAccountsService.migrateTempoAccounts(); }
 
     @GetMapping("tempoServerAccounts")
     public void getTempoServerAccounts() {
         tempoAccountsService.tempoServerAccounts();
     }
+
+    @GetMapping("deleteServerAccounts")
+    public void deleteTempoServerAccounts() { tempoAccountsService.deleteTempoServerAccounts(); }
 
     @GetMapping("jiraServerUserMap")
     public void getJiraServerUserMap() {

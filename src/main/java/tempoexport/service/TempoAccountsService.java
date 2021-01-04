@@ -8,6 +8,7 @@ import tempoexport.connector.TempoCloudConnector;
 import tempoexport.dto.*;
 import tempoexport.connector.TempoServerConnector;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,9 +43,14 @@ public class TempoAccountsService {
                 serverAccountContactDto.setKey("");
                 insertDto.setJiraServerContact(serverAccountContactDto);
 
-                log.info("insertDto key {}", insertDto.getKey());
-                ServerAccountInsertResponseDto responseDto = tempoServerConnector.insertAccount(insertDto);
-                log.info("response object for post {}", responseDto.toString());
+                //log.info("insertDto contact {}", insertDto.getJiraServerContact());
+                //log.info("insertDto key {}", insertDto.getKey());
+                //log.info("insertDto serverLead {}", insertDto.getJiraServerLead());
+                //log.info("insertDto name {}", insertDto.getName());
+                //log.info("insertDto status {}", insertDto.getStatus());
+
+                tempoServerConnector.insertAccount(insertDto);
+                //log.info("response object for post {}", responseDto.toString());
             }
         }
     }
@@ -65,7 +71,6 @@ public class TempoAccountsService {
             for (JiraServerUserResultsDto userKeyDto : dto) {
                 paramMap.put(userKeyDto.getDisplayName(), userKeyDto);
             }
-            log.info(String.valueOf(paramMap));
         }
         return paramMap;
     }
@@ -73,6 +78,14 @@ public class TempoAccountsService {
     public void tempoServerAccounts() {
         TempoServerAccountDto[] dto = tempoServerConnector.getTempoServerAccounts();
         log.info(String.valueOf(dto.length));
+    }
+
+    public void deleteTempoServerAccounts() {
+        TempoServerAccountDto[] dto = tempoServerConnector.getTempoServerAccounts();
+        for (int i = 0; i < dto.length; i++) {
+            TempoServerAccountDto dtoAccount = dto[i];
+            tempoServerConnector.deleteTempoServerAccounts(dtoAccount.getId());
+        }
     }
 
     public void tempoData() {
