@@ -8,7 +8,6 @@ import tempoexport.connector.TempoCloudConnector;
 import tempoexport.dto.*;
 import tempoexport.connector.TempoServerConnector;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +49,7 @@ public class TempoAccountsService {
                 //log.info("insertDto status {}", insertDto.getStatus());
 
                 tempoServerConnector.insertAccount(insertDto);
-                //log.info("response object for post {}", responseDto.toString());
+                log.info("Account created: {}", insertDto.toString());
             }
         }
     }

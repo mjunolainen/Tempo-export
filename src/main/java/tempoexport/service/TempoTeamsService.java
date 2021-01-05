@@ -25,7 +25,6 @@ public class TempoTeamsService {
         TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
         if (dto.getResults() != null) {
             for (CloudTeamResultsDto cloudTeamResultsDto : dto.getResults()) {
-
             }
         }
     }

@@ -25,6 +25,10 @@ public class TempoServerConnector {
     @Value("${tempo.passwordServer}")
     private String passwordServer;
 
+    @Value("${jira.server.max.users}")
+    private Integer jiraServerMaxUsers;
+
+
     public TempoServerTeamDto[] getTempoServerTeams() {
         try {
             ResponseEntity<TempoServerTeamDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.GET, getEntity(), TempoServerTeamDto[].class);
@@ -66,7 +70,7 @@ public class TempoServerConnector {
 
     public JiraServerUserResultsDto[] getJiraServerUsers() {
         try {
-            ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=1000", HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
+            ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=" + jiraServerMaxUsers, HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);

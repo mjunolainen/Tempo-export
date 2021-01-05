@@ -9,6 +9,4 @@ import java.util.List;
 public class JiraServerUsersDto {
     @JsonProperty("results")
     List<JiraServerUserResultsDto> results = null;
-
-
 }
