@@ -57,7 +57,7 @@ public class TempoAccountsService {
                 String tempoCloudLinksApi = cloudAccountResultsDto.getCloudAccountResultsLinksDto().getSelf();
                 log.info("tempoServerAccount {}", tempoCloudLinksApi);
 
-                CloudAccountLinksScopeDto tempoCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoCloudLinksApi);
+                CloudAccountLinksDto tempoCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoCloudLinksApi);
                 log.info("tempoCloudLinksDto {}", tempoCloudLinksDto.toString());
                 /*if (tempoCloudLinksDto.getResults() != null) {
                     for (CloudAccountLinksScopeDto cloudAccountLinksScopeDto : tempoCloudLinksDto.getResults()) {

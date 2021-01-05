@@ -7,10 +7,9 @@ import java.util.List;
 
 @Data
 public class CloudAccountLinksDto {
-
     String self;
-    Integer id;
-    @JsonProperty("scope")
-    List<CloudAccountLinksScopeDto> scope = null;
-
+    @JsonProperty("metadata")
+    CloudMetaDataDto metaData;
+    @JsonProperty("results")
+    List<CloudAccountLinksResultsDto> results = null;
 }
