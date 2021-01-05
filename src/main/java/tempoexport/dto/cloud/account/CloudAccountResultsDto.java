@@ -1,4 +1,4 @@
-package tempoexport.dto;
+package tempoexport.dto.cloud.account;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

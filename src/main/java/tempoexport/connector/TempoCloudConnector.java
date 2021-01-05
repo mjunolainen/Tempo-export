@@ -7,9 +7,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import tempoexport.dto.TempoCloudAccountDto;
-import tempoexport.dto.TempoCloudTeamDto;
-import tempoexport.dto.WorkLogDto;
+import tempoexport.dto.cloud.account.TempoCloudAccountDto;
+import tempoexport.dto.cloud.team.TempoCloudTeamDto;
+import tempoexport.dto.cloud.worklog.WorkLogDto;
 
 @Slf4j
 @Component
@@ -66,5 +66,4 @@ public class TempoCloudConnector {
             throw new RuntimeException("Status code exception ", sce);
         }
     }
-
 }

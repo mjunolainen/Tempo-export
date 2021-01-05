@@ -1,9 +1,10 @@
-package tempoexport.dto;
+package tempoexport.dto.cloud.account;
 
 import lombok.Data;
 
 @Data
-public class CloudTeamResultsLeadDto {
+public class CloudAccountResultsLeadDto {
+
     String self;
     String accountId;
     String displayName;
