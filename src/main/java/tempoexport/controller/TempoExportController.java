@@ -39,11 +39,12 @@ public class TempoExportController {
         tempoTeamsService.tempoServerTeams();
     }
 
-    @GetMapping("tempoData")
-    public void getTempoData() {
-        tempoAccountsService.tempoData();
-    }
+    @GetMapping("tempoServerAccountKeyIdMap")
+    public void getTempoServerAccountKeyIdMap() { tempoAccountsService.tempoServerAccountKeyIdMap(); }
 
-    @GetMapping("tempoCloudAccountLinks")
-    public void getTempoCloudAccountLinks() { tempoAccountsService.tempoCloudAccountLinks(); }
+    @GetMapping("tempoData")
+    public void getTempoData() { tempoAccountsService.tempoData(); }
+
+    @GetMapping("getTempoCloudAccounts")
+    public void getTempoCloudAccounts() { tempoAccountsService.getTempoCloudAccounts(); }
 }

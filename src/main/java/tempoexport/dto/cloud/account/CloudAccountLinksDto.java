@@ -11,6 +11,6 @@ public class CloudAccountLinksDto {
     String self;
     Integer id;
     @JsonProperty("scope")
-    List<CloudAccountLinksScopeDto> results = null;
+    List<CloudAccountLinksScopeDto> scope = null;
 
 }

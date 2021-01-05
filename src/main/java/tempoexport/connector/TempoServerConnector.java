@@ -9,6 +9,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import tempoexport.dto.server.account.ServerAccountDto;
 import tempoexport.dto.server.account.ServerAccountInsertResponseDto;
+import tempoexport.dto.server.account.ServerAccountLinksDto;
 import tempoexport.dto.server.account.TempoServerAccountDto;
 import tempoexport.dto.server.team.TempoServerTeamDto;
 import tempoexport.dto.server.user.JiraServerUserResultsDto;
@@ -42,7 +43,6 @@ public class TempoServerConnector {
             throw new RuntimeException("Status code exception ", sce);
         }
     }
-
 
     public TempoServerAccountDto[] getTempoServerAccounts() {
         try {
@@ -99,5 +99,21 @@ public class TempoServerConnector {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(usernameServer, passwordServer);
         return headers;
+    }
+
+    public ServerAccountLinksDto insertLinks(ServerAccountLinksDto insertLinksDto) {
+        try {
+            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/link", HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    private HttpEntity getEntityLinks(ServerAccountLinksDto insertLinksDto) {
+        HttpHeaders headers = getHeaders();
+        HttpEntity httpEntity = new HttpEntity(insertLinksDto, headers);
+        return httpEntity;
     }
 }

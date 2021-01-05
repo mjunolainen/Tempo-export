@@ -6,15 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.connector.TempoServerConnector;
+import tempoexport.dto.cloud.account.CloudAccountLinksDto;
+import tempoexport.dto.cloud.account.CloudAccountLinksScopeDto;
 import tempoexport.dto.cloud.account.CloudAccountResultsDto;
 import tempoexport.dto.cloud.account.TempoCloudAccountDto;
 import tempoexport.dto.cloud.worklog.WorkLogDto;
 import tempoexport.dto.server.account.ServerAccountDto;
+import tempoexport.dto.server.account.ServerAccountInsertResponseDto;
+import tempoexport.dto.server.account.ServerAccountLinksDto;
 import tempoexport.dto.server.account.TempoServerAccountDto;
 import tempoexport.dto.server.user.JiraServerUserDto;
 import tempoexport.dto.server.user.JiraServerUserResultsDto;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
@@ -27,8 +32,6 @@ public class TempoAccountsService {
 
     public void migrateTempoAccounts() {
         TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
-        //log.info("Count {}", dto.getMetaData().getCount());
-        //log.info("Results {}", dto.getResults());
 
         if (dto.getResults() != null) {
             for (CloudAccountResultsDto cloudAccountResultsDto : dto.getResults()) {
@@ -48,14 +51,26 @@ public class TempoAccountsService {
                 serverAccountContactDto.setKey("");
                 insertDto.setJiraServerContact(serverAccountContactDto);
 
-                //log.info("insertDto contact {}", insertDto.getJiraServerContact());
-                //log.info("insertDto key {}", insertDto.getKey());
-                //log.info("insertDto serverLead {}", insertDto.getJiraServerLead());
-                //log.info("insertDto name {}", insertDto.getName());
-                //log.info("insertDto status {}", insertDto.getStatus());
+                ServerAccountInsertResponseDto tempoServerAccount = tempoServerConnector.insertAccount(insertDto);
+                log.info("Account created: {}", insertDto.getKey());
 
-                tempoServerConnector.insertAccount(insertDto);
-                log.info("Account created: {}", insertDto.toString());
+                String tempoCloudLinksApi = cloudAccountResultsDto.getCloudAccountResultsLinksDto().getSelf();
+                log.info("tempoServerAccount {}", tempoCloudLinksApi);
+
+                CloudAccountLinksScopeDto tempoCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoCloudLinksApi);
+                log.info("tempoCloudLinksDto {}", tempoCloudLinksDto.toString());
+                /*if (tempoCloudLinksDto.getResults() != null) {
+                    for (CloudAccountLinksScopeDto cloudAccountLinksScopeDto : tempoCloudLinksDto.getResults()) {
+                        ServerAccountLinksDto insertLinksDto = new ServerAccountLinksDto();
+                        insertLinksDto.setAccountId(tempoServerAccount.getId());
+                        insertLinksDto.setKey(tempoServerAccount.getKey());
+                        insertLinksDto.setLinkType("MANUAL");
+                        insertLinksDto.setScope(cloudAccountLinksScopeDto.getId());
+                        insertLinksDto.setScopeType(cloudAccountLinksScopeDto.getType());
+                        tempoServerConnector.insertLinks(insertLinksDto);
+                        log.info("Links inserted for account: {}", insertDto.getKey());
+                    }
+                }*/
             }
         }
     }
@@ -83,6 +98,12 @@ public class TempoAccountsService {
     public void tempoServerAccounts() {
         TempoServerAccountDto[] dto = tempoServerConnector.getTempoServerAccounts();
         log.info(String.valueOf(dto.length));
+        for (int i = 0; i < dto.length; i++) {
+            TempoServerAccountDto tempoServerAccountIdDto = dto[i];
+            tempoServerAccountIdDto.getId();
+            tempoServerAccountIdDto.getKey();
+            log.info(tempoServerAccountIdDto.getId().toString(), tempoServerAccountIdDto.getKey());
+        }
     }
 
     public void deleteTempoServerAccounts() {
@@ -90,7 +111,25 @@ public class TempoAccountsService {
         for (int i = 0; i < dto.length; i++) {
             TempoServerAccountDto dtoAccount = dto[i];
             tempoServerConnector.deleteTempoServerAccounts(dtoAccount.getId());
+            log.info("Account deleted for: {}", dtoAccount.getKey());
         }
+    }
+
+    public Map<String, Integer> tempoServerAccountKeyIdMap(){
+        TempoServerAccountDto[] dto = tempoServerConnector.getTempoServerAccounts();
+        Map<String, Integer> paramMap = new HashMap<>();
+
+        if (dto.length > 0){
+            for (TempoServerAccountDto userKeyDto : dto){
+                paramMap.put(userKeyDto.getKey(), userKeyDto.getId());
+            }
+        }
+        return paramMap;
+    }
+
+    public void getTempoCloudAccounts() {
+        TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
+        log.info(String.valueOf(dto));
     }
 
     public void tempoData() {
