@@ -5,8 +5,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
-import tempoexport.dto.*;
 import tempoexport.connector.TempoServerConnector;
+import tempoexport.dto.cloud.account.CloudAccountResultsDto;
+import tempoexport.dto.cloud.account.TempoCloudAccountDto;
+import tempoexport.dto.cloud.worklog.WorkLogDto;
+import tempoexport.dto.server.account.ServerAccountDto;
+import tempoexport.dto.server.account.TempoServerAccountDto;
+import tempoexport.dto.server.user.JiraServerUserDto;
+import tempoexport.dto.server.user.JiraServerUserResultsDto;
 
 import java.util.HashMap;
 import java.util.Map;

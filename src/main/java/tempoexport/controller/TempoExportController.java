@@ -43,4 +43,7 @@ public class TempoExportController {
     public void getTempoData() {
         tempoAccountsService.tempoData();
     }
+
+    @GetMapping("tempoCloudAccountLinks")
+    public void getTempoCloudAccountLinks() { tempoAccountsService.tempoCloudAccountLinks(); }
 }

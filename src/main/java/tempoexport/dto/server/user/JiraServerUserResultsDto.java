@@ -1,4 +1,4 @@
-package tempoexport.dto;
+package tempoexport.dto.server.user;
 
 import lombok.Data;
 

@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.connector.TempoServerConnector;
-import tempoexport.dto.CloudTeamResultsDto;
-import tempoexport.dto.ServerTeamResultsDto;
-import tempoexport.dto.TempoCloudTeamDto;
-import tempoexport.dto.TempoServerTeamDto;
+import tempoexport.dto.cloud.team.CloudTeamResultsDto;
+import tempoexport.dto.cloud.team.TempoCloudTeamDto;
+import tempoexport.dto.server.team.TempoServerTeamDto;
 
 @Slf4j
 @Service

@@ -1,7 +1,8 @@
-package tempoexport.dto;
+package tempoexport.dto.cloud.team;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import tempoexport.dto.CloudMetaDataDto;
 
 import java.util.List;
 
