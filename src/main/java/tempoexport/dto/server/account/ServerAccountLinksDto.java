@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class ServerAccountLinksDto {
     Integer accountId;
+    Integer id;
     boolean defaultAccount;
     String key;
     String linkType;

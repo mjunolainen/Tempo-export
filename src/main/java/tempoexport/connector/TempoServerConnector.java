@@ -54,6 +54,14 @@ public class TempoServerConnector {
         }
     }
 
+    public void deleteTempoServerAccountLinks(Integer linkId) {
+        try {
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/link/{linkId}", HttpMethod.DELETE, getEntity(), void.class, linkId);
+        } catch (HttpStatusCodeException sce) {
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
     public void deleteTempoServerAccounts(Integer accountId) {
         try {
             restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{id}", HttpMethod.DELETE, getEntity(), void.class, accountId);
@@ -115,5 +123,15 @@ public class TempoServerConnector {
         HttpHeaders headers = getHeaders();
         HttpEntity httpEntity = new HttpEntity(insertLinksDto, headers);
         return httpEntity;
+    }
+
+    public ServerAccountLinksDto[] getTempoServerSingleAccountLinks(Integer accountId) {
+        try {
+            ResponseEntity<ServerAccountLinksDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{accountId}/link", HttpMethod.GET, getEntity(), ServerAccountLinksDto[].class, accountId);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
     }
 }

@@ -16,19 +16,6 @@ public class TempoExportController {
     @GetMapping("migrateTempoAccounts")
     public void getMigrateTempoAccounts() { tempoAccountsService.migrateTempoAccounts(); }
 
-    @GetMapping("tempoServerAccounts")
-    public void getTempoServerAccounts() {
-        tempoAccountsService.tempoServerAccounts();
-    }
-
-    @GetMapping("deleteServerAccounts")
-    public void deleteTempoServerAccounts() { tempoAccountsService.deleteTempoServerAccounts(); }
-
-    @GetMapping("jiraServerUserMap")
-    public void getJiraServerUserMap() {
-        tempoAccountsService.jiraServerUserMap();
-    }
-
     @GetMapping("tempoCloudTeams")
     public void getTempoCloudTeams() {
         tempoTeamsService.tempoCloudTeams();
@@ -38,13 +25,4 @@ public class TempoExportController {
     public void getTempoServerTeams() {
         tempoTeamsService.tempoServerTeams();
     }
-
-    @GetMapping("tempoServerAccountKeyIdMap")
-    public void getTempoServerAccountKeyIdMap() { tempoAccountsService.tempoServerAccountKeyIdMap(); }
-
-    @GetMapping("tempoData")
-    public void getTempoData() { tempoAccountsService.tempoData(); }
-
-    @GetMapping("getTempoCloudAccounts")
-    public void getTempoCloudAccounts() { tempoAccountsService.getTempoCloudAccounts(); }
 }

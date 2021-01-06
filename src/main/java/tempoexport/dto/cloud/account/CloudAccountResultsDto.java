@@ -16,6 +16,8 @@ public class CloudAccountResultsDto {
     CloudAccountResultsLeadDto cloudAccountResultsLeadDto;
     @JsonProperty("customer")
     CloudAccountResultsCustomerDto cloudAccountResultsCustomerDto;
+    @JsonProperty("contact")
+    CloudAccountResultsContactDto cloudAccountResultsContactDto;
     @JsonProperty("links")
     CloudAccountResultsLinksDto cloudAccountResultsLinksDto;
 
