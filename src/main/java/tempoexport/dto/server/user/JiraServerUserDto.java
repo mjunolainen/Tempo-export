@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class JiraServerUserDto {
-    String key;
     String username;
+    String key;
 }
