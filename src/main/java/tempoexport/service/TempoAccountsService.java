@@ -36,11 +36,8 @@ public class TempoAccountsService {
             ServerAccountLinksDto[] tempoServerSingleAccountLinks = tempoServerConnector.getTempoServerSingleAccountLinks(tempoServerAccountDto.getId());
             for (int j = 0; j < tempoServerSingleAccountLinks.length; j++) {
                 ServerAccountLinksDto tempoServerSingleAccountLink = tempoServerSingleAccountLinks[j];
-                log.info(tempoServerSingleAccountLink.toString());
                 tempoServerConnector.deleteTempoServerAccountLinks(tempoServerSingleAccountLink.getId());
-                log.info("Link to Project deleted:");
-                log.info("Account key: {}", tempoServerAccountDto.getKey());
-                log.info("Project name: {}", tempoServerSingleAccountLink.getName());
+                log.info("Link to Project deleted: {} from {}", tempoServerSingleAccountLink.getKey(), tempoServerAccountDto.getKey());
             }
         }
 
@@ -49,7 +46,7 @@ public class TempoAccountsService {
         for (int i = 0; i < deleteTempoServerAccountDto.length; i++) {
             TempoServerAccountDto dtoAccount = deleteTempoServerAccountDto[i];
             tempoServerConnector.deleteTempoServerAccounts(dtoAccount.getId());
-            log.info("Account {} deleted.", dtoAccount.getKey());
+            log.info("Account {} deleted", dtoAccount.getKey());
         }
 
         // Serveri accountide migratsioon pilvest serverisse
@@ -67,7 +64,6 @@ public class TempoAccountsService {
                 serverAccountLeadDto.setKey(serverLeadUserKey);
                 insertDto.setJiraServerLead(serverAccountLeadDto);
 
-
                 // Account contact migratsioon
                 String cloudContactDisplayName = "";
                 String serverContactUserKey = "";
@@ -80,15 +76,12 @@ public class TempoAccountsService {
                 serverAccountContactDto.setKey(serverContactUserKey);
                 insertDto.setJiraServerContact(serverAccountContactDto);
 
-                // TODO set customer. Sama moodi nagu account lead ja contact
-                // Account customer migration
+                // Account customer migratsioon
                 if (cloudAccountResultsDto != null && cloudAccountResultsDto.getCloudAccountResultsCustomerDto() != null) {
                     String cloudCustomerName = cloudAccountResultsDto.getCloudAccountResultsCustomerDto().getName();
                     String cloudCustomerKey = cloudAccountResultsDto.getCloudAccountResultsCustomerDto().getKey();
-                    Integer cloudCustomerId = cloudAccountResultsDto.getCloudAccountResultsCustomerDto().getId();
 
                     CloudAccountResultsCustomerDto serverAccountCustomerDto = new CloudAccountResultsCustomerDto();
-                    serverAccountCustomerDto.setId(cloudCustomerId);
                     serverAccountCustomerDto.setKey(cloudCustomerKey);
                     serverAccountCustomerDto.setName(cloudCustomerName);
                     insertDto.setJiraServerCustomer(serverAccountCustomerDto);
@@ -101,10 +94,7 @@ public class TempoAccountsService {
 
                 // Account links migratsioon
                 String tempoCloudLinksApi = cloudAccountResultsDto.getCloudAccountResultsLinksDto().getSelf();
-                //log.info("tempoServerAccount {}", tempoCloudLinksApi);
-
                 CloudAccountLinksDto tempoCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoCloudLinksApi);
-                //log.info("tempoCloudLinksDto {}", tempoCloudLinksDto.toString());
 
                 if (tempoCloudLinksDto.getResults() != null) {
                     for (CloudAccountLinksResultsDto cloudAccountLinksResultsDto : tempoCloudLinksDto.getResults()) {
@@ -115,9 +105,7 @@ public class TempoAccountsService {
                         insertLinksDto.setScope(cloudAccountLinksResultsDto.getCloudAccountLinksScopeDto().getId());
                         insertLinksDto.setScopeType(cloudAccountLinksResultsDto.getCloudAccountLinksScopeDto().getType());
                         tempoServerConnector.insertLinks(insertLinksDto);
-                        log.info("Link to Project inserted:");
-                        log.info("Account key: {}", insertDto.getKey());
-                        log.info("Project key: {}", insertLinksDto.getKey());
+                        log.info("Link to Project inserted: {} to {}", insertLinksDto.getScope(), insertDto.getKey());
                     }
                 }
             }
