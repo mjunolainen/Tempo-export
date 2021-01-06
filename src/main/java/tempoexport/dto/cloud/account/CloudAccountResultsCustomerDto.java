@@ -6,6 +6,6 @@ import lombok.Data;
 public class CloudAccountResultsCustomerDto {
     String self;
     String key;
-    int id;
+    Integer id;
     String name;
 }
