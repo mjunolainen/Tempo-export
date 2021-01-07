@@ -6,4 +6,6 @@ import lombok.Data;
 public class JiraServerUserDto {
     String username;
     String key;
+    //String emailAddress;
+    //boolean active;
 }

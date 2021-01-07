@@ -19,6 +19,10 @@ public class TempoTeamsService {
     @Autowired
     private TempoServerConnector tempoServerConnector;
 
+    // TODO teamide kustutamine serverist
+    // TODO kas enne teamide kustutamist on vaja veel midagi kustutada, et saaks teame kustutada?
+    // TODO teamide migratsiooni pilvest serverisse
+    // TODO kui teamid on migreeritud, siis sealt edasi - team members. Midagi veel?
 
     public void migrateTempoTeams() {
         TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();

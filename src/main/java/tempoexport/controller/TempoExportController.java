@@ -25,4 +25,7 @@ public class TempoExportController {
     public void getTempoServerTeams() {
         tempoTeamsService.tempoServerTeams();
     }
+
+    @GetMapping("jiraServerLeadEmail")
+    public void jiraServerLeadEmail() {tempoAccountsService.jiraServerLeadEmail(); }
 }
