@@ -6,12 +6,10 @@ import tempoexport.dto.server.user.ServerTempoUserDto;
 
 @Data
 public class ServerTeamResultsDto {
-    int id;
-    boolean isPublic;
+    String id;
     String lead;
     @JsonProperty("leadUser")
-    ServerTempoUserDto serverTempoUserDto;
-    String mission;
+    ServerTempoUserDto serverTempoLeadUserDto;
     String name;
     String summary;
     @JsonProperty("teamProgram")

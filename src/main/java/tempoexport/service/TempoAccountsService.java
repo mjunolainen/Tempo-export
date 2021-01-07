@@ -68,7 +68,7 @@ public class TempoAccountsService {
                 serverAccountLeadDto.setUsername(cloudLeadDisplayName);
                 serverAccountLeadDto.setKey(serverLeadUserKey);
                 //serverAccountLeadDto.setEmailAddress(serverLeadEmail);
-                serverAccountLeadDto.setActive(true);
+                //serverAccountLeadDto.setActive(true);
                 insertDto.setJiraServerLead(serverAccountLeadDto);
 
                 // Account contact migratsioon
@@ -105,16 +105,16 @@ public class TempoAccountsService {
 
                 // Account links migratsioon
                 String tempoCloudLinksApi = cloudAccountResultsDto.getCloudAccountResultsLinksDto().getSelf();
-                CloudAccountLinksDto tempoCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoCloudLinksApi);
+                CloudLinksDto tempoCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoCloudLinksApi);
 
                 if (tempoCloudLinksDto.getResults() != null) {
-                    for (CloudAccountLinksResultsDto cloudAccountLinksResultsDto : tempoCloudLinksDto.getResults()) {
+                    for (CloudLinksResultsDto cloudLinksResultsDto : tempoCloudLinksDto.getResults()) {
                         ServerAccountLinksDto insertLinksDto = new ServerAccountLinksDto();
                         insertLinksDto.setAccountId(tempoServerAccount.getId());
                         insertLinksDto.setKey(tempoServerAccount.getKey());
                         insertLinksDto.setLinkType("MANUAL");
-                        insertLinksDto.setScope(cloudAccountLinksResultsDto.getCloudAccountLinksScopeDto().getId());
-                        insertLinksDto.setScopeType(cloudAccountLinksResultsDto.getCloudAccountLinksScopeDto().getType());
+                        insertLinksDto.setScope(cloudLinksResultsDto.getCloudLinksScopeDto().getId());
+                        insertLinksDto.setScopeType(cloudLinksResultsDto.getCloudLinksScopeDto().getType());
                         tempoServerConnector.insertLinks(insertLinksDto);
                         log.info("Link to Project inserted: {} to {}", insertLinksDto.getScope(), insertDto.getKey());
                     }
@@ -153,20 +153,6 @@ public class TempoAccountsService {
             return jiraUserServerMap;
         } else {
             return jiraUserServerMap;
-        }
-    }
-
-    public void jiraServerLeadEmail() {
-        TempoCloudAccountDto dto = tempoCloudConnector.getTempoCloudAccounts();
-        if (dto.getResults() != null) {
-            for (CloudAccountResultsDto cloudAccountResultsDto : dto.getResults()) {
-                String cloudLeadDisplayName = cloudAccountResultsDto.getCloudAccountResultsLeadDto().getDisplayName();
-                String serverLeadUserKey = jiraServerUserKey(cloudLeadDisplayName);
-                String serverLeadEmail = jiraServerUserEmail(cloudLeadDisplayName);
-                log.info(cloudLeadDisplayName);
-                log.info(serverLeadUserKey);
-                log.info(serverLeadEmail);
-            }
         }
     }
 }

@@ -14,9 +14,9 @@ public class CloudTeamResultsDto {
     @JsonProperty("program")
     CloudTeamResultsProgramDto cloudTeamResultsProgramDto;
     @JsonProperty("links")
-    CloudTeamResultsLinksDto cloudTeamResultsLinksDto;
+    CloudTeamResultsSelfDto cloudTeamResultsSelfDto;
     @JsonProperty("members")
-    CloudTeamResultsMembersDto cloudTeamResultsMembersDto;
+    CloudTeamResultsSelfDto cloudTeamResultsMembersDto;
     @JsonProperty("permissions")
-    CloudTeamResultsPermissionsDto cloudTeamResultsPermissionsDto;
+    CloudTeamResultsSelfDto cloudTeamResultsPermissionsDto;
 }

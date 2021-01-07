@@ -16,6 +16,10 @@ public class TempoExportController {
     @GetMapping("migrateTempoAccounts")
     public void getMigrateTempoAccounts() { tempoAccountsService.migrateTempoAccounts(); }
 
+    @GetMapping("migrateTempoTeams")
+    public void migrateTempoTeams() {tempoTeamsService.migrateTempoTeams(); }
+
+    //
     @GetMapping("tempoCloudTeams")
     public void getTempoCloudTeams() {
         tempoTeamsService.tempoCloudTeams();
@@ -26,6 +30,6 @@ public class TempoExportController {
         tempoTeamsService.tempoServerTeams();
     }
 
-    @GetMapping("jiraServerLeadEmail")
-    public void jiraServerLeadEmail() {tempoAccountsService.jiraServerLeadEmail(); }
+    @GetMapping("deleteTempoTeams")
+    public void deleteTempoTeams() { tempoTeamsService.deleteTempoTeams(); }
 }

@@ -7,7 +7,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import tempoexport.dto.cloud.account.CloudAccountLinksDto;
+import tempoexport.dto.cloud.account.CloudLinksDto;
 import tempoexport.dto.cloud.account.TempoCloudAccountDto;
 import tempoexport.dto.cloud.team.TempoCloudTeamDto;
 import tempoexport.dto.cloud.worklog.WorkLogDto;
@@ -68,13 +68,13 @@ public class TempoCloudConnector {
         }
     }
 
-    public CloudAccountLinksDto getTempoCloudAccountLinks(String tempoCloudLinksApi) {
+    public CloudLinksDto getTempoCloudAccountLinks(String tempoCloudLinksApi) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(token);
             HttpEntity httpEntity = new HttpEntity(null, headers);
-            ResponseEntity<CloudAccountLinksDto> usage = restTemplate.exchange(tempoCloudLinksApi, HttpMethod.GET, httpEntity, CloudAccountLinksDto.class);
+            ResponseEntity<CloudLinksDto> usage = restTemplate.exchange(tempoCloudLinksApi, HttpMethod.GET, httpEntity, CloudLinksDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);

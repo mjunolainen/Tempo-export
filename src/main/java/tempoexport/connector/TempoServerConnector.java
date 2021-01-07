@@ -11,7 +11,8 @@ import tempoexport.dto.server.account.ServerAccountDto;
 import tempoexport.dto.server.account.ServerAccountInsertResponseDto;
 import tempoexport.dto.server.account.ServerAccountLinksDto;
 import tempoexport.dto.server.account.TempoServerAccountDto;
-import tempoexport.dto.server.team.TempoServerTeamDto;
+import tempoexport.dto.server.team.ServerTeamInsertResponseDto;
+import tempoexport.dto.server.team.ServerTeamResultsDto;
 import tempoexport.dto.server.user.JiraServerUserResultsDto;
 
 @Slf4j
@@ -34,9 +35,9 @@ public class TempoServerConnector {
     private Integer jiraServerMaxUsers;
 
 
-    public TempoServerTeamDto[] getTempoServerTeams() {
+    public ServerTeamResultsDto[] getTempoServerTeams() {
         try {
-            ResponseEntity<TempoServerTeamDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.GET, getEntity(), TempoServerTeamDto[].class);
+            ResponseEntity<ServerTeamResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.GET, getEntity(), ServerTeamResultsDto[].class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -119,6 +120,16 @@ public class TempoServerConnector {
         }
     }
 
+    public ServerAccountLinksDto insertTeamLinks(ServerAccountLinksDto insertLinksDto) {
+        try {
+            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/1/link", HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
     private HttpEntity getEntityLinks(ServerAccountLinksDto insertLinksDto) {
         HttpHeaders headers = getHeaders();
         HttpEntity httpEntity = new HttpEntity(insertLinksDto, headers);
@@ -133,5 +144,29 @@ public class TempoServerConnector {
             log.error("Status Code exception {}", sce);
             throw new RuntimeException("Status code exception ", sce);
         }
+    }
+
+    public void deleteTempoServerTeams(String teamId) {
+        try {
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team/{id}", HttpMethod.DELETE, getEntity(), void.class, teamId);
+        } catch (HttpStatusCodeException sce) {
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public ServerTeamInsertResponseDto insertTeam(ServerTeamResultsDto insertTeam) {
+        try {
+            ResponseEntity<ServerTeamInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.POST, getEntityTeam(insertTeam), ServerTeamInsertResponseDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    private HttpEntity getEntityTeam(ServerTeamResultsDto team) {
+        HttpHeaders headers = getHeaders();
+        HttpEntity httpEntity = new HttpEntity(team, headers);
+        return httpEntity;
     }
 }
