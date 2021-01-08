@@ -12,7 +12,7 @@ import tempoexport.dto.server.account.ServerAccountInsertResponseDto;
 import tempoexport.dto.server.account.ServerAccountLinksDto;
 import tempoexport.dto.server.account.TempoServerAccountDto;
 import tempoexport.dto.server.team.ServerTeamInsertResponseDto;
-import tempoexport.dto.server.team.ServerTeamResultsDto;
+import tempoexport.dto.server.team.ServerTeamDto;
 import tempoexport.dto.server.user.JiraServerUserResultsDto;
 
 @Slf4j
@@ -35,9 +35,9 @@ public class TempoServerConnector {
     private Integer jiraServerMaxUsers;
 
 
-    public ServerTeamResultsDto[] getTempoServerTeams() {
+    public TempoServerAccountDto[] getTempoServerAccounts() {
         try {
-            ResponseEntity<ServerTeamResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.GET, getEntity(), ServerTeamResultsDto[].class);
+            ResponseEntity<TempoServerAccountDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.GET, getEntity(), TempoServerAccountDto[].class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -45,9 +45,27 @@ public class TempoServerConnector {
         }
     }
 
-    public TempoServerAccountDto[] getTempoServerAccounts() {
+    public ServerAccountInsertResponseDto insertTempoServerAccount(ServerAccountDto insertAccount) {
         try {
-            ResponseEntity<TempoServerAccountDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.GET, getEntity(), TempoServerAccountDto[].class);
+            ResponseEntity<ServerAccountInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.POST, getEntityAccount(insertAccount), ServerAccountInsertResponseDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public void deleteTempoServerAccounts(Integer accountId) {
+        try {
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{id}", HttpMethod.DELETE, getEntity(), void.class, accountId);
+        } catch (HttpStatusCodeException sce) {
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public ServerAccountLinksDto insertTempoServerAccountLinks(ServerAccountLinksDto insertLinksDto) {
+        try {
+            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/link", HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -63,17 +81,47 @@ public class TempoServerConnector {
         }
     }
 
-    public void deleteTempoServerAccounts(Integer accountId) {
+    public ServerTeamDto[] getTempoServerTeams() {
         try {
-            restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{id}", HttpMethod.DELETE, getEntity(), void.class, accountId);
+            ResponseEntity<ServerTeamDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.GET, getEntity(), ServerTeamDto[].class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public ServerTeamInsertResponseDto insertTempoServerTeam(ServerTeamDto insertTeam) {
+        try {
+            ResponseEntity<ServerTeamInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.POST, getEntityTeam(insertTeam), ServerTeamInsertResponseDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public void deleteTempoServerTeams(String teamId) {
+        try {
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team/{id}", HttpMethod.DELETE, getEntity(), void.class, teamId);
         } catch (HttpStatusCodeException sce) {
             throw new RuntimeException("Status code exception ", sce);
         }
     }
 
-    public ServerAccountInsertResponseDto insertAccount(ServerAccountDto insertAccount) {
+    public ServerAccountLinksDto insertServerTeamLinks(ServerAccountLinksDto insertLinksDto) {
         try {
-            ResponseEntity<ServerAccountInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.POST, getEntityAccount(insertAccount), ServerAccountInsertResponseDto.class);
+            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/1/link", HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public ServerAccountLinksDto[] getTempoServerSingleAccountLinks(Integer accountId) {
+        try {
+            ResponseEntity<ServerAccountLinksDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{accountId}/link", HttpMethod.GET, getEntity(), ServerAccountLinksDto[].class, accountId);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -91,10 +139,11 @@ public class TempoServerConnector {
         }
     }
 
-    private HttpEntity getEntityAccount(ServerAccountDto account) {
-        HttpHeaders headers = getHeaders();
-        HttpEntity httpEntity = new HttpEntity(account, headers);
-        return httpEntity;
+    private HttpHeaders getHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(usernameServer, passwordServer);
+        return headers;
     }
 
     private HttpEntity getEntity() {
@@ -103,70 +152,21 @@ public class TempoServerConnector {
         return httpEntity;
     }
 
-    private HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBasicAuth(usernameServer, passwordServer);
-        return headers;
+    private HttpEntity getEntityAccount(ServerAccountDto account) {
+        HttpHeaders headers = getHeaders();
+        HttpEntity httpEntity = new HttpEntity(account, headers);
+        return httpEntity;
     }
 
-    public ServerAccountLinksDto insertLinks(ServerAccountLinksDto insertLinksDto) {
-        try {
-            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/link", HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
-            return usage.getBody();
-        } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
-            throw new RuntimeException("Status code exception ", sce);
-        }
-    }
-
-    public ServerAccountLinksDto insertTeamLinks(ServerAccountLinksDto insertLinksDto) {
-        try {
-            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/1/link", HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
-            return usage.getBody();
-        } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
-            throw new RuntimeException("Status code exception ", sce);
-        }
+    private HttpEntity getEntityTeam(ServerTeamDto team) {
+        HttpHeaders headers = getHeaders();
+        HttpEntity httpEntity = new HttpEntity(team, headers);
+        return httpEntity;
     }
 
     private HttpEntity getEntityLinks(ServerAccountLinksDto insertLinksDto) {
         HttpHeaders headers = getHeaders();
         HttpEntity httpEntity = new HttpEntity(insertLinksDto, headers);
-        return httpEntity;
-    }
-
-    public ServerAccountLinksDto[] getTempoServerSingleAccountLinks(Integer accountId) {
-        try {
-            ResponseEntity<ServerAccountLinksDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{accountId}/link", HttpMethod.GET, getEntity(), ServerAccountLinksDto[].class, accountId);
-            return usage.getBody();
-        } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
-            throw new RuntimeException("Status code exception ", sce);
-        }
-    }
-
-    public void deleteTempoServerTeams(String teamId) {
-        try {
-            restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team/{id}", HttpMethod.DELETE, getEntity(), void.class, teamId);
-        } catch (HttpStatusCodeException sce) {
-            throw new RuntimeException("Status code exception ", sce);
-        }
-    }
-
-    public ServerTeamInsertResponseDto insertTeam(ServerTeamResultsDto insertTeam) {
-        try {
-            ResponseEntity<ServerTeamInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.POST, getEntityTeam(insertTeam), ServerTeamInsertResponseDto.class);
-            return usage.getBody();
-        } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
-            throw new RuntimeException("Status code exception ", sce);
-        }
-    }
-
-    private HttpEntity getEntityTeam(ServerTeamResultsDto team) {
-        HttpHeaders headers = getHeaders();
-        HttpEntity httpEntity = new HttpEntity(team, headers);
         return httpEntity;
     }
 }

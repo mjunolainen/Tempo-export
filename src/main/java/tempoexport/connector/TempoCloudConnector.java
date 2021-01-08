@@ -9,7 +9,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import tempoexport.dto.cloud.account.CloudLinksDto;
 import tempoexport.dto.cloud.account.TempoCloudAccountDto;
-import tempoexport.dto.cloud.team.TempoCloudTeamDto;
+import tempoexport.dto.cloud.team.CloudTeamsListDto;
+import tempoexport.dto.cloud.team.members.CloudTeamMembersDto;
 import tempoexport.dto.cloud.worklog.WorkLogDto;
 
 @Slf4j
@@ -54,13 +55,13 @@ public class TempoCloudConnector {
         }
     }
 
-    public TempoCloudTeamDto getTempoCloudTeams() {
+    public CloudTeamsListDto getTempoCloudTeams() {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(token);
             HttpEntity httpEntity = new HttpEntity(null, headers);
-            ResponseEntity<TempoCloudTeamDto> usage = restTemplate.exchange(tempoCloudUrl + "/teams", HttpMethod.GET, httpEntity, TempoCloudTeamDto.class);
+            ResponseEntity<CloudTeamsListDto> usage = restTemplate.exchange(tempoCloudUrl + "/teams", HttpMethod.GET, httpEntity, CloudTeamsListDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -75,6 +76,20 @@ public class TempoCloudConnector {
             headers.setBearerAuth(token);
             HttpEntity httpEntity = new HttpEntity(null, headers);
             ResponseEntity<CloudLinksDto> usage = restTemplate.exchange(tempoCloudLinksApi, HttpMethod.GET, httpEntity, CloudLinksDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public CloudTeamMembersDto getTempoCloudTeamMembers(String tempoCloudTeamMembersApi) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(token);
+            HttpEntity httpEntity = new HttpEntity(null, headers);
+            ResponseEntity<CloudTeamMembersDto> usage = restTemplate.exchange(tempoCloudTeamMembersApi, HttpMethod.GET, httpEntity, CloudTeamMembersDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
