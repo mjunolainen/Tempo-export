@@ -12,10 +12,6 @@ import tempoexport.dto.server.account.ServerAccountInsertResponseDto;
 import tempoexport.dto.server.account.ServerAccountLinksDto;
 import tempoexport.dto.server.account.TempoServerAccountDto;
 import tempoexport.dto.server.user.JiraServerUserDto;
-import tempoexport.dto.server.user.JiraServerUserResultsDto;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -24,8 +20,8 @@ public class TempoAccountsService {
     private TempoCloudConnector tempoCloudConnector;
     @Autowired
     private TempoServerConnector tempoServerConnector;
-
-    Map<String, JiraServerUserResultsDto> jiraUserServerMap = null;
+    @Autowired
+    private TempoServiceUtil tempoServiceUtil;
 
     public void migrateTempoAccounts() {
 
@@ -57,34 +53,25 @@ public class TempoAccountsService {
                 BeanUtils.copyProperties(cloudAccountResultsDto, insertDto);
 
                 // Account lead migratsioon
-                //TODO email ei tule kaasa
-                //TODO kaasa ei tule ka boolean active.
-                // Kas võib olla, et need on automaatselt Jira poolt antavad omadused?
-                // Samas, kui ma kasutan jiraServerLeadEmail() päringut, siis saan leadi ja contacti e-maili kätte.
                 String cloudLeadDisplayName = cloudAccountResultsDto.getCloudAccountResultsLeadDto().getDisplayName();
-                String serverLeadUserKey = jiraServerUserKey(cloudLeadDisplayName);
-                //String serverLeadEmail = jiraServerUserEmail(cloudLeadDisplayName);
+                //String serverLeadUserKey = jiraServerUserKey(cloudLeadDisplayName);
+                String serverLeadUserKey = tempoServiceUtil.jiraServerUserKey(cloudLeadDisplayName);
                 JiraServerUserDto serverAccountLeadDto = new JiraServerUserDto();
                 serverAccountLeadDto.setUsername(cloudLeadDisplayName);
                 serverAccountLeadDto.setKey(serverLeadUserKey);
-                //serverAccountLeadDto.setEmailAddress(serverLeadEmail);
-                //serverAccountLeadDto.setActive(true);
                 insertDto.setJiraServerLead(serverAccountLeadDto);
 
                 // Account contact migratsioon
                 String cloudContactDisplayName = "";
                 String serverContactUserKey = "";
-                String serverContactEmail = "";
                 if (cloudAccountResultsDto != null && cloudAccountResultsDto.getCloudAccountResultsContactDto() != null) {
                     cloudContactDisplayName = cloudAccountResultsDto.getCloudAccountResultsContactDto().getDisplayName();
-                    serverContactUserKey = jiraServerUserKey(cloudContactDisplayName);
-                    //serverContactEmail = jiraServerUserEmail(cloudContactDisplayName);
+                    //serverContactUserKey = jiraServerUserKey(cloudContactDisplayName);
+                    serverContactUserKey = tempoServiceUtil.jiraServerUserKey(cloudContactDisplayName);
                 }
                 JiraServerUserDto serverAccountContactDto = new JiraServerUserDto();
                 serverAccountContactDto.setUsername(cloudContactDisplayName);
                 serverAccountContactDto.setKey(serverContactUserKey);
-                //serverAccountContactDto.setEmailAddress(serverContactEmail);
-                //serverAccountContactDto.setActive(true);
                 insertDto.setJiraServerContact(serverAccountContactDto);
 
                 // Account customer migratsioon
@@ -120,39 +107,6 @@ public class TempoAccountsService {
                     }
                 }
             }
-        }
-    }
-
-    private String jiraServerUserKey(String cloudDisplayName) {
-        String serverUserKey = null;
-        if (jiraServerUserMap().containsKey(cloudDisplayName)) {
-            serverUserKey = jiraServerUserMap().get(cloudDisplayName).getKey();
-        }
-        return serverUserKey;
-    }
-
-    private String jiraServerUserEmail(String cloudDisplayName) {
-        String serverUserEmail = null;
-        if (jiraServerUserMap().containsKey(cloudDisplayName)) {
-            serverUserEmail = jiraServerUserMap().get(cloudDisplayName).getEmailAddress();
-        }
-        return serverUserEmail;
-    }
-
-    private Map<String, JiraServerUserResultsDto> jiraServerUserMap() {
-        if (jiraUserServerMap == null) {
-            JiraServerUserResultsDto[] dto = tempoServerConnector.getJiraServerUsers();
-            Map<String, JiraServerUserResultsDto> paramMap = new HashMap<>();
-
-            if (dto.length > 0) {
-                for (JiraServerUserResultsDto userKeyDto : dto) {
-                    paramMap.put(userKeyDto.getDisplayName(), userKeyDto);
-                }
-            }
-            jiraUserServerMap = paramMap;
-            return jiraUserServerMap;
-        } else {
-            return jiraUserServerMap;
         }
     }
 }

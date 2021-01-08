@@ -1,24 +1,15 @@
 package tempoexport.service;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.connector.TempoServerConnector;
-import tempoexport.dto.cloud.account.CloudAccountResultsDto;
-import tempoexport.dto.cloud.account.CloudLinksDto;
-import tempoexport.dto.cloud.account.CloudLinksResultsDto;
 import tempoexport.dto.cloud.team.CloudTeamResultsDto;
 import tempoexport.dto.cloud.team.TempoCloudTeamDto;
-import tempoexport.dto.server.account.ServerAccountLinksDto;
 import tempoexport.dto.server.team.ServerTeamInsertResponseDto;
 import tempoexport.dto.server.team.ServerTeamResultsDto;
-import tempoexport.dto.server.user.JiraServerUserResultsDto;
 import tempoexport.dto.server.user.ServerTempoUserDto;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -28,8 +19,8 @@ public class TempoTeamsService {
     private TempoCloudConnector tempoCloudConnector;
     @Autowired
     private TempoServerConnector tempoServerConnector;
-
-    Map<String, JiraServerUserResultsDto> getJiraUserServerMap = null;
+    @Autowired
+    private TempoServiceUtil tempoServiceUtil;
 
     public void migrateTempoTeams() {
 
@@ -52,10 +43,10 @@ public class TempoTeamsService {
 
                 ServerTempoUserDto serverTempoTeamLeadDto = new ServerTempoUserDto();
                 serverTempoTeamLeadDto.setDisplayname(cloudTeamResultsDto.getCloudTeamResultsLeadDto().getDisplayName());
-                String serverLeadUserKey = getJiraServerUserKey(serverTempoTeamLeadDto.getDisplayname());
+                String serverLeadUserKey = tempoServiceUtil.jiraServerUserKey(serverTempoTeamLeadDto.getDisplayname());
                 serverTempoTeamLeadDto.setKey(serverLeadUserKey);
                 serverTempoTeamLeadDto.setJiraUser(true);
-                serverTempoTeamLeadDto.setName(getJiraUserName(serverLeadUserKey));
+                serverTempoTeamLeadDto.setName(tempoServiceUtil.jiraUserName(serverLeadUserKey));
                 insertDto.setServerTempoLeadUserDto(serverTempoTeamLeadDto);
                 insertDto.setLead(serverLeadUserKey);
 
@@ -89,39 +80,6 @@ public class TempoTeamsService {
         }
     }
 
-    private String getJiraServerUserKey(String cloudDisplayName) {
-        String serverUserKey = null;
-        if (getJiraServerUserMap().containsKey(cloudDisplayName)) {
-            serverUserKey = getJiraServerUserMap().get(cloudDisplayName).getKey();
-        }
-        return serverUserKey;
-    }
-
-    private String getJiraUserName(String cloudDisplayName) {
-        String serverUserName = null;
-        if (getJiraServerUserMap().containsKey(cloudDisplayName)) {
-            serverUserName = getJiraServerUserMap().get(cloudDisplayName).getName();
-        }
-        return serverUserName;
-    }
-
-    private Map<String, JiraServerUserResultsDto> getJiraServerUserMap() {
-        if (getJiraUserServerMap == null) {
-            JiraServerUserResultsDto[] dto = tempoServerConnector.getJiraServerUsers();
-            Map<String, JiraServerUserResultsDto> paramMap = new HashMap<>();
-
-            if (dto.length > 0) {
-                for (JiraServerUserResultsDto userKeyDto : dto) {
-                    paramMap.put(userKeyDto.getDisplayName(), userKeyDto);
-                }
-            }
-            getJiraUserServerMap = paramMap;
-            return getJiraUserServerMap;
-        } else {
-            return getJiraUserServerMap;
-        }
-    }
-
     // Eraldi meetodid testimiseks. Hiljem kokku migrateTempoTeams() alla ja võib ära kustutada
     public void tempoCloudTeams() {
         TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
@@ -130,6 +88,8 @@ public class TempoTeamsService {
 
     public void tempoServerTeams() {
         ServerTeamResultsDto[] dto = tempoServerConnector.getTempoServerTeams();
+
+
         log.info(String.valueOf(dto.length));
     }
 
