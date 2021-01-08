@@ -12,7 +12,6 @@ public class TempoCloudTeamDto {
     @JsonProperty("metadata")
     CloudMetaDataDto metaData;
     String self;
-
     @JsonProperty("results")
     List<CloudTeamResultsDto> results = null;
 }

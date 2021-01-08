@@ -3,7 +3,7 @@ package tempoexport.dto.cloud.account;
 import lombok.Data;
 
 @Data
-public class CloudAccountLinksScopeDto {
+public class CloudLinksScopeDto {
     String self;
     Integer id;
     String type;

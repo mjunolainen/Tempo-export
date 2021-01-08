@@ -6,10 +6,10 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CloudAccountLinksDto {
+public class CloudLinksDto {
     String self;
     @JsonProperty("metadata")
     CloudMetaDataDto metaData;
     @JsonProperty("results")
-    List<CloudAccountLinksResultsDto> results = null;
+    List<CloudLinksResultsDto> results = null;
 }
