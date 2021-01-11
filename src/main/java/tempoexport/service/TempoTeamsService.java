@@ -9,13 +9,9 @@ import tempoexport.dto.cloud.team.CloudTeamDto;
 import tempoexport.dto.cloud.team.CloudTeamsListDto;
 import tempoexport.dto.cloud.team.members.CloudTeamMemberDto;
 import tempoexport.dto.cloud.team.members.CloudTeamMembersDto;
-import tempoexport.dto.cloud.team.members.CloudTeamResultsMembershipsDto;
 import tempoexport.dto.server.team.ServerTeamInsertResponseDto;
 import tempoexport.dto.server.team.ServerTeamDto;
-import tempoexport.dto.server.team.members.ServerTeamMemberDto;
-import tempoexport.dto.server.team.members.ServerTeamMemberMembershipDto;
-import tempoexport.dto.server.team.members.ServerTeamMemberNameDto;
-import tempoexport.dto.server.team.members.ServerTeamMemberRoleDto;
+import tempoexport.dto.server.team.members.*;
 import tempoexport.dto.server.user.ServerTempoUserDto;
 
 @Slf4j
@@ -57,41 +53,11 @@ public class TempoTeamsService {
                 insertTempoServerTeamDto.setServerTempoLeadUserDto(tempoServerTeamLeadDto);
                 insertTempoServerTeamDto.setLead(serverLeadUserKey);
 
-                //TODO Team --> program migratsioon on vaja siit välja tõsta. Sellisel kujul see ei tööta.
-               /* if (tempoCloudTeamDto != null && tempoCloudTeamDto.getCloudTeamResultsProgramDto() != null) {
-                    ServerTeamResultsTeamProgramDto serverTempoTeamProgramDto = new ServerTeamResultsTeamProgramDto();
-                    serverTempoTeamProgramDto.setId((tempoCloudTeamDto.getCloudTeamResultsProgramDto().getId()));
-                    serverTempoTeamProgramDto.setName(tempoCloudTeamDto.getCloudTeamResultsProgramDto().getName());
-                    insertTempoServerTeamDto.setServerTeamResultsTeamProgramDto(serverTempoTeamProgramDto);
-                }*/
                 ServerTeamInsertResponseDto tempoServerTeam = tempoServerConnector.insertTempoServerTeam(insertTempoServerTeamDto);
                 log.info("Team {} created.", insertTempoServerTeamDto.getName());
-                /*
 
-                String tempoTeamCloudLinksApi = tempoCloudTeamsDto.getSelf();
-                CloudLinksDto tempoTeamsCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoTeamCloudLinksApi);
-                if (tempoTeamsCloudLinksDto.getResults() != null) {
-                    for (CloudLinksResultsDto cloudLinksResultsDto : tempoTeamsCloudLinksDto.getResults()) {
-                        ServerAccountLinksDto insertTeamLinksDto = new ServerAccountLinksDto();
-                        insertTeamLinksDto.setAccountId(tempoServerTeam.getId());
-                        insertTeamLinksDto.setKey((tempoServerTeam.getKey()));
-                        insertTeamLinksDto.setLinkType("MANUAL");
-                        insertTeamLinksDto.setScope(cloudLinksResultsDto.getCloudLinksScopeDto().getId());
-                        insertTeamLinksDto.setScopeType(cloudLinksResultsDto.getCloudLinksScopeDto().getType());
 
-                        tempoServerConnector.insertTeamLinks(insertTeamLinksDto);
-                        log.info("Link to Project inserted: {} to {}", insertTeamLinksDto.getScope(), insertTempoServerTeamDto.getName());
-                    }
-                }*/
-            }
-        }
-    }
-
-    // Eraldi meetodid testimiseks. Hiljem kokku migrateTempoTeams() alla ja võib ära kustutada
-    public void tempoCloudTeamMembers() {
-        CloudTeamsListDto tempoCloudTeamsListDto = tempoCloudConnector.getTempoCloudTeams();
-        if (tempoCloudTeamsListDto.getResults() != null) {
-            for (CloudTeamDto tempoCloudTeamDto : tempoCloudTeamsListDto.getResults()) {
+                // Tempo team member migration
                 String tempoCloudTeamMembersApi = tempoCloudTeamDto.getCloudTeamResultsMembersDto().getSelf();
 
                 CloudTeamMembersDto tempoCloudTeamMembersListDto = tempoCloudConnector.getTempoCloudTeamMembers(tempoCloudTeamMembersApi);
@@ -131,9 +97,13 @@ public class TempoTeamsService {
                         tempoServerTeamMemberMembershipDto.setServerTeamMemberRoleDto(tempoServerTeamMemberRoleDto);
                         tempoServerTeamMemberDto.setServerTeamMemberMembershipDto(tempoServerTeamMemberMembershipDto);
 
-                        //TODO team memberid serverisse teamide külge
-
                         log.info(tempoServerTeamMemberDto.toString());
+
+                        //TODO team memberid serverisse teamide külge
+                        // Server maas - siit edasi testimata kood
+
+                        ServerTeamMemberInsertResponseDto tempoServerTeamMemeber = tempoServerConnector.insertTempoServerTeamMember(tempoServerTeamMemberDto, tempoServerTeam.getId());
+                        log.info("Team member {} inserted for team {}", tempoServerTeamMemberDto.getServerTeamMemberNameDto().getDisplayName(), tempoCloudTeamDto.getName());
                     }
                 }
             }

@@ -6,4 +6,7 @@ import lombok.Data;
 public class ServerTeamMemberNameDto {
     String name;
     String type;
+    String displayName;
+    String key;
+    Integer teamMemberId;
 }
