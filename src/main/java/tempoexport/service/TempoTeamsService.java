@@ -39,10 +39,10 @@ public class TempoTeamsService {
         CloudTeamsListDto tempoCloudTeamsListDto = tempoCloudConnector.getTempoCloudTeams();
         if (tempoCloudTeamsListDto.getResults() != null) {
             for (CloudTeamDto tempoCloudTeamDto : tempoCloudTeamsListDto.getResults()) {
-                ServerTeamDto insertTempoServerTeamDto = new ServerTeamDto();
+                ServerTeamDto tempoServerTeamDto = new ServerTeamDto();
 
-                insertTempoServerTeamDto.setName(tempoCloudTeamDto.getName());
-                insertTempoServerTeamDto.setSummary(tempoCloudTeamDto.getSummary());
+                tempoServerTeamDto.setName(tempoCloudTeamDto.getName());
+                tempoServerTeamDto.setSummary(tempoCloudTeamDto.getSummary());
 
                 ServerTempoUserDto tempoServerTeamLeadDto = new ServerTempoUserDto();
                 tempoServerTeamLeadDto.setDisplayname(tempoCloudTeamDto.getCloudTeamResultsUserDto().getDisplayName());
@@ -50,11 +50,11 @@ public class TempoTeamsService {
                 tempoServerTeamLeadDto.setKey(serverLeadUserKey);
                 tempoServerTeamLeadDto.setJiraUser(true);
                 tempoServerTeamLeadDto.setName(tempoServiceUtil.getJiraUserName(serverLeadUserKey));
-                insertTempoServerTeamDto.setServerTempoLeadUserDto(tempoServerTeamLeadDto);
-                insertTempoServerTeamDto.setLead(serverLeadUserKey);
+                tempoServerTeamDto.setServerTempoLeadUserDto(tempoServerTeamLeadDto);
+                tempoServerTeamDto.setLead(serverLeadUserKey);
 
-                ServerTeamInsertResponseDto tempoServerTeam = tempoServerConnector.insertTempoServerTeam(insertTempoServerTeamDto);
-                log.info("Team {} created.", insertTempoServerTeamDto.getName());
+                ServerTeamInsertResponseDto tempoServerTeam = tempoServerConnector.insertTempoServerTeam(tempoServerTeamDto);
+                log.info("Team {} created.", tempoServerTeamDto.getName());
 
 
                 // Tempo team member migration

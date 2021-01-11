@@ -11,6 +11,7 @@ import tempoexport.dto.cloud.account.CloudLinksDto;
 import tempoexport.dto.cloud.account.TempoCloudAccountDto;
 import tempoexport.dto.cloud.team.CloudTeamsListDto;
 import tempoexport.dto.cloud.team.members.CloudTeamMembersDto;
+import tempoexport.dto.cloud.worklog.CloudWorklogsListDto;
 import tempoexport.dto.cloud.worklog.WorkLogDto;
 
 @Slf4j
@@ -25,21 +26,6 @@ public class TempoCloudConnector {
 
     @Value("${tempo.token}")
     private String token;
-
-
-    public WorkLogDto getWorklogs() {
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(token);
-            HttpEntity httpEntity = new HttpEntity<>(null, headers);
-            ResponseEntity<WorkLogDto> usage = restTemplate.exchange(tempoCloudUrl + "/worklogs", HttpMethod.GET, httpEntity, WorkLogDto.class);
-            return usage.getBody();
-        } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
-            throw new RuntimeException("Status code exception ", sce);
-        }
-    }
 
     public TempoCloudAccountDto getTempoCloudAccounts() {
         try {
@@ -90,6 +76,34 @@ public class TempoCloudConnector {
             headers.setBearerAuth(token);
             HttpEntity httpEntity = new HttpEntity(null, headers);
             ResponseEntity<CloudTeamMembersDto> usage = restTemplate.exchange(tempoCloudTeamMembersApi, HttpMethod.GET, httpEntity, CloudTeamMembersDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public CloudWorklogsListDto getTempoCloudWorklogs() {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(token);
+            HttpEntity httpEntity = new HttpEntity<>(null, headers);
+            ResponseEntity<CloudWorklogsListDto> usage = restTemplate.exchange(tempoCloudUrl + "/worklogs/?offset=0&limit=10", HttpMethod.GET, httpEntity, CloudWorklogsListDto.class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public CloudWorklogsListDto getNextTempoCloudWorklogs(String nextCloudWorklogUrl) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(token);
+            HttpEntity httpEntity = new HttpEntity(null, headers);
+            ResponseEntity<CloudWorklogsListDto> usage = restTemplate.exchange(nextCloudWorklogUrl, HttpMethod.GET, httpEntity, CloudWorklogsListDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);

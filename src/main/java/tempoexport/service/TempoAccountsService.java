@@ -49,8 +49,8 @@ public class TempoAccountsService {
         TempoCloudAccountDto tempoCloudAccountsDto = tempoCloudConnector.getTempoCloudAccounts();
         if (tempoCloudAccountsDto.getResults() != null) {
             for (CloudAccountResultsDto tempoCloudAccountDto : tempoCloudAccountsDto.getResults()) {
-                ServerAccountDto insertTempoServerAccountDto = new ServerAccountDto();
-                BeanUtils.copyProperties(tempoCloudAccountDto, insertTempoServerAccountDto);
+                ServerAccountDto tempoServerAccountDto = new ServerAccountDto();
+                BeanUtils.copyProperties(tempoCloudAccountDto, tempoServerAccountDto);
 
                 // Account lead migratsioon
                 String cloudAccountLeadDisplayName = tempoCloudAccountDto.getCloudAccountResultsLeadDto().getDisplayName();
@@ -58,7 +58,7 @@ public class TempoAccountsService {
                 JiraServerUserDto serverAccountLeadDto = new JiraServerUserDto();
                 serverAccountLeadDto.setUsername(cloudAccountLeadDisplayName);
                 serverAccountLeadDto.setKey(serverAccountLeadKey);
-                insertTempoServerAccountDto.setJiraServerLead(serverAccountLeadDto);
+                tempoServerAccountDto.setJiraServerLead(serverAccountLeadDto);
 
                 // Account contact migratsioon
                 String cloudContactDisplayName = "";
@@ -71,7 +71,7 @@ public class TempoAccountsService {
                 JiraServerUserDto serverAccountContactDto = new JiraServerUserDto();
                 serverAccountContactDto.setUsername(cloudContactDisplayName);
                 serverAccountContactDto.setKey(serverContactUserKey);
-                insertTempoServerAccountDto.setJiraServerContact(serverAccountContactDto);
+                tempoServerAccountDto.setJiraServerContact(serverAccountContactDto);
 
                 // Account customer migratsioon
                 if (tempoCloudAccountDto != null && tempoCloudAccountDto.getCloudAccountResultsCustomerDto() != null) {
@@ -81,13 +81,13 @@ public class TempoAccountsService {
                     CloudAccountResultsCustomerDto serverAccountCustomerDto = new CloudAccountResultsCustomerDto();
                     serverAccountCustomerDto.setKey(cloudCustomerKey);
                     serverAccountCustomerDto.setName(cloudCustomerName);
-                    insertTempoServerAccountDto.setJiraServerCustomer(serverAccountCustomerDto);
+                    tempoServerAccountDto.setJiraServerCustomer(serverAccountCustomerDto);
 
-                    log.info("Customer {} for account {} created", cloudCustomerName, insertTempoServerAccountDto.getKey());
+                    log.info("Customer {} for account {} created", cloudCustomerName, tempoServerAccountDto.getKey());
                 }
 
-                ServerAccountInsertResponseDto tempoServerAccount = tempoServerConnector.insertTempoServerAccount(insertTempoServerAccountDto);
-                log.info("Account {} created.", insertTempoServerAccountDto.getKey());
+                ServerAccountInsertResponseDto tempoServerAccount = tempoServerConnector.insertTempoServerAccount(tempoServerAccountDto);
+                log.info("Account {} created.", tempoServerAccountDto.getKey());
 
                 // Account links migratsioon
                 String tempoCloudLinksApi = tempoCloudAccountDto.getCloudAccountResultsLinksDto().getSelf();
@@ -102,7 +102,7 @@ public class TempoAccountsService {
                         insertLinksDto.setScope(cloudLinksResultsDto.getCloudLinksScopeDto().getId());
                         insertLinksDto.setScopeType(cloudLinksResultsDto.getCloudLinksScopeDto().getType());
                         tempoServerConnector.insertTempoServerAccountLinks(insertLinksDto);
-                        log.info("Link to Project inserted: {} to {}", insertLinksDto.getScope(), insertTempoServerAccountDto.getKey());
+                        log.info("Link to Project inserted: {} to {}", insertLinksDto.getScope(), tempoServerAccountDto.getKey());
                     }
                 }
             }
