@@ -17,23 +17,23 @@ public class TempoServiceUtil {
     private TempoServerConnector tempoServerConnector;
     Map<String, JiraServerUserResultsDto> jiraUserServerMap = null;
 
-    public String jiraServerUserKey(String cloudDisplayName) {
+    public String getJiraServerUserKey(String cloudDisplayName) {
         String serverUserKey = null;
-        if (jiraServerUserMap().containsKey(cloudDisplayName)) {
-            serverUserKey = jiraServerUserMap().get(cloudDisplayName).getKey();
+        if (getJiraServerUserMap().containsKey(cloudDisplayName)) {
+            serverUserKey = getJiraServerUserMap().get(cloudDisplayName).getKey();
         }
         return serverUserKey;
     }
 
-    public String jiraUserName(String cloudDisplayName) {
+    public String getJiraUserName(String cloudDisplayName) {
         String serverUserName = null;
-        if (jiraServerUserMap().containsKey(cloudDisplayName)) {
-            serverUserName = jiraServerUserMap().get(cloudDisplayName).getName();
+        if (getJiraServerUserMap().containsKey(cloudDisplayName)) {
+            serverUserName = getJiraServerUserMap().get(cloudDisplayName).getName();
         }
         return serverUserName;
     }
 
-    public Map<String, JiraServerUserResultsDto> jiraServerUserMap() {
+    public Map<String, JiraServerUserResultsDto> getJiraServerUserMap() {
         if (jiraUserServerMap == null) {
             JiraServerUserResultsDto[] dto = tempoServerConnector.getJiraServerUsers();
             Map<String, JiraServerUserResultsDto> paramMap = new HashMap<>();
@@ -50,10 +50,10 @@ public class TempoServiceUtil {
         }
     }
 
-    public String jiraServerUserEmail(String cloudDisplayName) {
+    public String getJiraServerUserEmail(String cloudDisplayName) {
         String serverUserEmail = null;
-        if (jiraServerUserMap().containsKey(cloudDisplayName)) {
-            serverUserEmail = jiraServerUserMap().get(cloudDisplayName).getEmailAddress();
+        if (getJiraServerUserMap().containsKey(cloudDisplayName)) {
+            serverUserEmail = getJiraServerUserMap().get(cloudDisplayName).getEmailAddress();
         }
         return serverUserEmail;
     }

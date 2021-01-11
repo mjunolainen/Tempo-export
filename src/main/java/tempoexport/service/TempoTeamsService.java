@@ -46,10 +46,10 @@ public class TempoTeamsService {
 
                 ServerTempoUserDto tempoServerTeamLeadDto = new ServerTempoUserDto();
                 tempoServerTeamLeadDto.setDisplayname(tempoCloudTeamDto.getCloudTeamResultsUserDto().getDisplayName());
-                String serverLeadUserKey = tempoServiceUtil.jiraServerUserKey(tempoServerTeamLeadDto.getDisplayname());
+                String serverLeadUserKey = tempoServiceUtil.getJiraServerUserKey(tempoServerTeamLeadDto.getDisplayname());
                 tempoServerTeamLeadDto.setKey(serverLeadUserKey);
                 tempoServerTeamLeadDto.setJiraUser(true);
-                tempoServerTeamLeadDto.setName(tempoServiceUtil.jiraUserName(serverLeadUserKey));
+                tempoServerTeamLeadDto.setName(tempoServiceUtil.getJiraUserName(serverLeadUserKey));
                 insertTempoServerTeamDto.setServerTempoLeadUserDto(tempoServerTeamLeadDto);
                 insertTempoServerTeamDto.setLead(serverLeadUserKey);
 
@@ -58,34 +58,39 @@ public class TempoTeamsService {
 
 
                 // Tempo team member migration
-                String tempoCloudTeamMembersApi = tempoCloudTeamDto.getCloudTeamResultsMembersDto().getSelf();
+                String tempoCloudTeamMembersUrl = tempoCloudTeamDto.getCloudTeamResultsMembersDto().getSelf();
+                CloudTeamMembersDto tempoCloudTeamMembersListDto = tempoCloudConnector.getTempoCloudTeamMembers(tempoCloudTeamMembersUrl);
+                log.info(tempoCloudTeamMembersListDto.getMetaData().getCount().toString());
 
-                CloudTeamMembersDto tempoCloudTeamMembersListDto = tempoCloudConnector.getTempoCloudTeamMembers(tempoCloudTeamMembersApi);
-                //log.info(tempoCloudTeamMembersListDto.getMetaData().getCount().toString());
                 if (tempoCloudTeamMembersListDto != null) {
                     for (CloudTeamMemberDto tempoCloudTeamMemberDto : tempoCloudTeamMembersListDto.getResults()) {
 
                         ServerTeamMemberDto tempoServerTeamMemberDto = new ServerTeamMemberDto();
 
                         ServerTeamMemberNameDto tempoServerTeamMemberNameDto = new ServerTeamMemberNameDto();
-                        tempoServerTeamMemberNameDto.setName(tempoServiceUtil.jiraServerUserKey(tempoCloudTeamMemberDto.getCloudTeamResultsMemberDto().getDisplayName()));
+                        if (tempoCloudTeamMemberDto != null &&
+                                tempoCloudTeamMemberDto.getCloudTeamResultsMemberDto() != null) {
+                            tempoServerTeamMemberNameDto.setName(tempoServiceUtil.getJiraServerUserKey(tempoCloudTeamMemberDto
+                                    .getCloudTeamResultsMemberDto().getDisplayName()));
+                        }
                         tempoServerTeamMemberNameDto.setType("USER");
                         tempoServerTeamMemberDto.setServerTeamMemberNameDto(tempoServerTeamMemberNameDto);
 
                         ServerTeamMemberMembershipDto tempoServerTeamMemberMembershipDto = new ServerTeamMemberMembershipDto();
                         ServerTeamMemberRoleDto tempoServerTeamMemberRoleDto = new ServerTeamMemberRoleDto();
 
-                        //See siin ei ole kõige graatsilisem lahendus, aga ainukene, mis reede õhtul töötas.
-                        //Probleem selles, et JSONis on memberships, kus kaks alamjaotust self ja active.
-                        //Ühel(!) kasutajal active puudub, seega !=null ei tööta. Vaatame seda veel
+                        if (tempoCloudTeamMemberDto != null &&
+                                tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto() != null &&
+                                tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto().getCloudTeamResultsMembershipsActiveDto() != null) {
+                            tempoServerTeamMemberMembershipDto.setAvailability(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto()
+                                    .getCloudTeamResultsMembershipsActiveDto().getCommitmentPercent());
+                            tempoServerTeamMemberMembershipDto.setDateFrom(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto()
+                                    .getCloudTeamResultsMembershipsActiveDto().getFrom());
+                            tempoServerTeamMemberMembershipDto.setDateTo(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto()
+                                    .getCloudTeamResultsMembershipsActiveDto().getTo());
 
-                        if (tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto().toString().contains("commitmentPercent")) {
-                            tempoServerTeamMemberMembershipDto.setAvailability(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto().getCloudTeamResultsMembershipsActiveDto().getCommitmentPercent());
-                            tempoServerTeamMemberMembershipDto.setDateFrom(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto().getCloudTeamResultsMembershipsActiveDto().getFrom());
-                            tempoServerTeamMemberMembershipDto.setDateTo(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto().getCloudTeamResultsMembershipsActiveDto().getTo());
-
-                            tempoServerTeamMemberRoleDto.setId(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto().getCloudTeamResultsMembershipsActiveDto().getCloudTeamResultsMembershipsActiveRoleDto().getId());
-
+                            tempoServerTeamMemberRoleDto.setId(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto()
+                                    .getCloudTeamResultsMembershipsActiveDto().getCloudTeamResultsMembershipsActiveRoleDto().getId());
                         } else {
                             tempoServerTeamMemberMembershipDto.setAvailability("");
                             tempoServerTeamMemberMembershipDto.setDateFrom("");
@@ -102,8 +107,10 @@ public class TempoTeamsService {
                         //TODO team memberid serverisse teamide külge
                         // Server maas - siit edasi testimata kood
 
-                        ServerTeamMemberInsertResponseDto tempoServerTeamMemeber = tempoServerConnector.insertTempoServerTeamMember(tempoServerTeamMemberDto, tempoServerTeam.getId());
-                        log.info("Team member {} inserted for team {}", tempoServerTeamMemberDto.getServerTeamMemberNameDto().getDisplayName(), tempoCloudTeamDto.getName());
+                        ServerTeamMemberInsertResponseDto tempoServerTeamMemeber = tempoServerConnector.insertTempoServerTeamMember
+                                (tempoServerTeamMemberDto, tempoServerTeam.getId());
+                        log.info("Team member {} inserted for team {}",
+                                tempoServerTeamMemberDto.getServerTeamMemberNameDto().getName(), tempoCloudTeamDto.getName());
                     }
                 }
             }

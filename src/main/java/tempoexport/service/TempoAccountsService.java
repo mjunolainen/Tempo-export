@@ -54,7 +54,7 @@ public class TempoAccountsService {
 
                 // Account lead migratsioon
                 String cloudAccountLeadDisplayName = tempoCloudAccountDto.getCloudAccountResultsLeadDto().getDisplayName();
-                String serverAccountLeadKey = tempoServiceUtil.jiraServerUserKey(cloudAccountLeadDisplayName);
+                String serverAccountLeadKey = tempoServiceUtil.getJiraServerUserKey(cloudAccountLeadDisplayName);
                 JiraServerUserDto serverAccountLeadDto = new JiraServerUserDto();
                 serverAccountLeadDto.setUsername(cloudAccountLeadDisplayName);
                 serverAccountLeadDto.setKey(serverAccountLeadKey);
@@ -66,7 +66,7 @@ public class TempoAccountsService {
                 if (tempoCloudAccountDto != null && tempoCloudAccountDto.getCloudAccountResultsContactDto() != null) {
                     cloudContactDisplayName = tempoCloudAccountDto.getCloudAccountResultsContactDto().getDisplayName();
                     //serverContactUserKey = jiraServerUserKey(cloudContactDisplayName);
-                    serverContactUserKey = tempoServiceUtil.jiraServerUserKey(cloudContactDisplayName);
+                    serverContactUserKey = tempoServiceUtil.getJiraServerUserKey(cloudContactDisplayName);
                 }
                 JiraServerUserDto serverAccountContactDto = new JiraServerUserDto();
                 serverAccountContactDto.setUsername(cloudContactDisplayName);
