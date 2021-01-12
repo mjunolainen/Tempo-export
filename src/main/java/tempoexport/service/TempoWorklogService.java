@@ -8,8 +8,6 @@ import tempoexport.connector.TempoCloudConnector;
 import tempoexport.connector.TempoServerConnector;
 import tempoexport.dto.cloud.worklog.CloudWorklogDto;
 import tempoexport.dto.cloud.worklog.CloudWorklogsListDto;
-import tempoexport.dto.server.account.ServerAccountInsertResponseDto;
-import tempoexport.dto.server.team.ServerTeamDto;
 import tempoexport.dto.server.worklog.ServerWorklogDto;
 import tempoexport.dto.server.worklog.ServerWorklogId;
 import tempoexport.dto.server.worklog.ServerWorklogInsertResponseDto;
@@ -37,10 +35,8 @@ public class TempoWorklogService {
         }
 
         CloudWorklogsListDto tempoCloudWorklogsList = tempoCloudConnector.getTempoCloudWorklogs();
-        // log.info(tempoCloudWorklogsList.getSelf());
-        // log.info(tempoCloudWorklogsList.getCloudWorklogsMetaDataDto().getCount().toString());
-        // log.info("Next url: {}", tempoCloudWorklogsList.getCloudWorklogsMetaDataDto().getNext());
 
+        //TODO tõsta while loopist välja ja kontrolli, kas worklogide serverisse lisamine töötab
         while (tempoCloudWorklogsList.getCloudWorklogsMetaDataDto().getNext() != null) {
             if (tempoCloudWorklogsList.getResults() != null) {
                 for (CloudWorklogDto cloudWorklogDto : tempoCloudWorklogsList.getResults()) {

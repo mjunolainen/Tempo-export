@@ -12,7 +12,6 @@ import tempoexport.dto.cloud.account.TempoCloudAccountDto;
 import tempoexport.dto.cloud.team.CloudTeamsListDto;
 import tempoexport.dto.cloud.team.members.CloudTeamMembersDto;
 import tempoexport.dto.cloud.worklog.CloudWorklogsListDto;
-import tempoexport.dto.cloud.worklog.WorkLogDto;
 
 @Slf4j
 @Component

@@ -60,14 +60,14 @@ public class TempoTeamsService {
                 // Tempo team member migration
                 String tempoCloudTeamMembersUrl = tempoCloudTeamDto.getCloudTeamResultsMembersDto().getSelf();
                 CloudTeamMembersDto tempoCloudTeamMembersListDto = tempoCloudConnector.getTempoCloudTeamMembers(tempoCloudTeamMembersUrl);
-                log.info(tempoCloudTeamMembersListDto.getMetaData().getCount().toString());
+                //log.info(tempoCloudTeamMembersListDto.getMetaData().getCount().toString());
 
                 if (tempoCloudTeamMembersListDto != null) {
                     for (CloudTeamMemberDto tempoCloudTeamMemberDto : tempoCloudTeamMembersListDto.getResults()) {
 
                         ServerTeamMemberDto tempoServerTeamMemberDto = new ServerTeamMemberDto();
-
                         ServerTeamMemberNameDto tempoServerTeamMemberNameDto = new ServerTeamMemberNameDto();
+
                         if (tempoCloudTeamMemberDto != null &&
                                 tempoCloudTeamMemberDto.getCloudTeamResultsMemberDto() != null) {
                             tempoServerTeamMemberNameDto.setName(tempoServiceUtil.getJiraServerUserKey(tempoCloudTeamMemberDto
@@ -95,7 +95,6 @@ public class TempoTeamsService {
                             tempoServerTeamMemberMembershipDto.setAvailability("");
                             tempoServerTeamMemberMembershipDto.setDateFrom("");
                             tempoServerTeamMemberMembershipDto.setDateTo("");
-
                             tempoServerTeamMemberRoleDto.setId(0);
                         }
 
@@ -104,8 +103,7 @@ public class TempoTeamsService {
 
                         log.info(tempoServerTeamMemberDto.toString());
 
-                        //TODO team memberid serverisse teamide külge
-                        // Server maas - siit edasi testimata kood
+                        //TODO kontrolli, kas teamide külge liikmete lisamine töötab
 
                         ServerTeamMemberInsertResponseDto tempoServerTeamMemeber = tempoServerConnector.insertTempoServerTeamMember
                                 (tempoServerTeamMemberDto, tempoServerTeam.getId());

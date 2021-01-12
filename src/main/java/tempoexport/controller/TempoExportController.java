@@ -16,7 +16,6 @@ public class TempoExportController {
     @Autowired
     private TempoWorklogService tempoWorklogService;
 
-
     @GetMapping("migrateTempoAccounts")
     public void getMigrateTempoAccounts() { tempoAccountsService.migrateTempoAccounts(); }
 
@@ -25,4 +24,5 @@ public class TempoExportController {
 
     @GetMapping("migrateTempoWorklogs")
     public void migrateTempoWorklogs() {tempoWorklogService.migrateTempoWorklogs(); }
+
 }
