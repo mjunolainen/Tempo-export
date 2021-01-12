@@ -1,7 +1,6 @@
 package tempoexport.connector;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -17,7 +16,9 @@ import tempoexport.dto.server.team.ServerTeamDto;
 import tempoexport.dto.server.team.members.ServerTeamMemberDto;
 import tempoexport.dto.server.team.members.ServerTeamMemberInsertResponseDto;
 import tempoexport.dto.server.user.JiraServerUserResultsDto;
+import tempoexport.dto.server.worklog.ServerWorklogDto;
 import tempoexport.dto.server.worklog.ServerWorklogId;
+import tempoexport.dto.server.worklog.ServerWorklogInsertResponseDto;
 
 @Slf4j
 @Component
@@ -41,7 +42,8 @@ public class TempoServerConnector {
 
     public TempoServerAccountDto[] getTempoServerAccounts() {
         try {
-            ResponseEntity<TempoServerAccountDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.GET, getEntity(), TempoServerAccountDto[].class);
+            ResponseEntity<TempoServerAccountDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account",
+                    HttpMethod.GET, getEntity(), TempoServerAccountDto[].class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -51,7 +53,8 @@ public class TempoServerConnector {
 
     public ServerAccountInsertResponseDto insertTempoServerAccount(ServerAccountDto insertAccount) {
         try {
-            ResponseEntity<ServerAccountInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.POST, getEntityAccount(insertAccount), ServerAccountInsertResponseDto.class);
+            ResponseEntity<ServerAccountInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account",
+                    HttpMethod.POST, getEntityAccount(insertAccount), ServerAccountInsertResponseDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -171,6 +174,17 @@ public class TempoServerConnector {
         }
     }
 
+    public ServerWorklogInsertResponseDto[] insertTempoServerWorklog(ServerWorklogDto insertWorklog) {
+        try {
+            ResponseEntity<ServerWorklogInsertResponseDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs",
+                    HttpMethod.POST, getEntityWorklog(insertWorklog), ServerWorklogInsertResponseDto[].class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
     public void deleteTempoServerWorklogs(Integer worklogId) {
         try {
             restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/{worklogId}", HttpMethod.DELETE, getEntity(), void.class, worklogId);
@@ -213,6 +227,12 @@ public class TempoServerConnector {
     private HttpEntity getEntityLinks(ServerAccountLinksDto insertLinksDto) {
         HttpHeaders headers = getHeaders();
         HttpEntity httpEntity = new HttpEntity(insertLinksDto, headers);
+        return httpEntity;
+    }
+
+    private HttpEntity getEntityWorklog(ServerWorklogDto worklog) {
+        HttpHeaders headers = getHeaders();
+        HttpEntity httpEntity = new HttpEntity(worklog, headers);
         return httpEntity;
     }
 }
