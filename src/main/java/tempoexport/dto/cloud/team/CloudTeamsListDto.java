@@ -7,11 +7,10 @@ import tempoexport.dto.cloud.account.CloudMetaDataDto;
 import java.util.List;
 
 @Data
-public class TempoCloudTeamDto {
-
+public class CloudTeamsListDto {
     @JsonProperty("metadata")
     CloudMetaDataDto metaData;
     String self;
     @JsonProperty("results")
-    List<CloudTeamResultsDto> results = null;
+    List<CloudTeamDto> results = null;
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import tempoexport.dto.server.user.ServerTempoUserDto;
 
 @Data
-public class ServerTeamResultsDto {
+public class ServerTeamDto {
     String id;
     String lead;
     @JsonProperty("leadUser")

@@ -5,10 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.connector.TempoServerConnector;
-import tempoexport.dto.cloud.team.CloudTeamResultsDto;
-import tempoexport.dto.cloud.team.TempoCloudTeamDto;
+import tempoexport.dto.cloud.team.CloudTeamDto;
+import tempoexport.dto.cloud.team.CloudTeamsListDto;
+import tempoexport.dto.cloud.team.members.CloudTeamMemberDto;
+import tempoexport.dto.cloud.team.members.CloudTeamMembersDto;
 import tempoexport.dto.server.team.ServerTeamInsertResponseDto;
-import tempoexport.dto.server.team.ServerTeamResultsDto;
+import tempoexport.dto.server.team.ServerTeamDto;
+import tempoexport.dto.server.team.members.*;
 import tempoexport.dto.server.user.ServerTempoUserDto;
 
 @Slf4j
@@ -25,80 +28,92 @@ public class TempoTeamsService {
     public void migrateTempoTeams() {
 
         // Serveri teamide kustutamine
-        ServerTeamResultsDto[] deleteTempoServerTeamDto = tempoServerConnector.getTempoServerTeams();
-        for (int i = 0; i < deleteTempoServerTeamDto.length; i++) {
-            ServerTeamResultsDto dtoTeam = deleteTempoServerTeamDto[i];
+        ServerTeamDto[] tempoServerTeams = tempoServerConnector.getTempoServerTeams();
+        for (int i = 0; i < tempoServerTeams.length; i++) {
+            ServerTeamDto dtoTeam = tempoServerTeams[i];
             tempoServerConnector.deleteTempoServerTeams(dtoTeam.getId());
             log.info("Team {} deleted", dtoTeam.getName());
         }
 
         // Teami migratsiooni pilvest serverisse
-        TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
-        if (dto.getResults() != null) {
-            for (CloudTeamResultsDto cloudTeamResultsDto : dto.getResults()) {
-                ServerTeamResultsDto insertDto = new ServerTeamResultsDto();
+        CloudTeamsListDto tempoCloudTeamsListDto = tempoCloudConnector.getTempoCloudTeams();
+        if (tempoCloudTeamsListDto.getResults() != null) {
+            for (CloudTeamDto tempoCloudTeamDto : tempoCloudTeamsListDto.getResults()) {
+                ServerTeamDto insertTempoServerTeamDto = new ServerTeamDto();
 
-                insertDto.setName(cloudTeamResultsDto.getName());
-                insertDto.setSummary(cloudTeamResultsDto.getSummary());
+                insertTempoServerTeamDto.setName(tempoCloudTeamDto.getName());
+                insertTempoServerTeamDto.setSummary(tempoCloudTeamDto.getSummary());
 
-                ServerTempoUserDto serverTempoTeamLeadDto = new ServerTempoUserDto();
-                serverTempoTeamLeadDto.setDisplayname(cloudTeamResultsDto.getCloudTeamResultsLeadDto().getDisplayName());
-                String serverLeadUserKey = tempoServiceUtil.jiraServerUserKey(serverTempoTeamLeadDto.getDisplayname());
-                serverTempoTeamLeadDto.setKey(serverLeadUserKey);
-                serverTempoTeamLeadDto.setJiraUser(true);
-                serverTempoTeamLeadDto.setName(tempoServiceUtil.jiraUserName(serverLeadUserKey));
-                insertDto.setServerTempoLeadUserDto(serverTempoTeamLeadDto);
-                insertDto.setLead(serverLeadUserKey);
+                ServerTempoUserDto tempoServerTeamLeadDto = new ServerTempoUserDto();
+                tempoServerTeamLeadDto.setDisplayname(tempoCloudTeamDto.getCloudTeamResultsUserDto().getDisplayName());
+                String serverLeadUserKey = tempoServiceUtil.getJiraServerUserKey(tempoServerTeamLeadDto.getDisplayname());
+                tempoServerTeamLeadDto.setKey(serverLeadUserKey);
+                tempoServerTeamLeadDto.setJiraUser(true);
+                tempoServerTeamLeadDto.setName(tempoServiceUtil.getJiraUserName(serverLeadUserKey));
+                insertTempoServerTeamDto.setServerTempoLeadUserDto(tempoServerTeamLeadDto);
+                insertTempoServerTeamDto.setLead(serverLeadUserKey);
 
-                //TODO Team --> program migratsioon on vaja siit välja tõsta. Sellisel kujul see ei tööta.
-               /* if (cloudTeamResultsDto != null && cloudTeamResultsDto.getCloudTeamResultsProgramDto() != null) {
-                    ServerTeamResultsTeamProgramDto serverTempoTeamProgramDto = new ServerTeamResultsTeamProgramDto();
-                    serverTempoTeamProgramDto.setId((cloudTeamResultsDto.getCloudTeamResultsProgramDto().getId()));
-                    serverTempoTeamProgramDto.setName(cloudTeamResultsDto.getCloudTeamResultsProgramDto().getName());
-                    insertDto.setServerTeamResultsTeamProgramDto(serverTempoTeamProgramDto);
-                }*/
-                ServerTeamInsertResponseDto tempoServerTeam = tempoServerConnector.insertTeam(insertDto);
-                log.info("Team {} created.", insertDto.getName());
-                /*
+                ServerTeamInsertResponseDto tempoServerTeam = tempoServerConnector.insertTempoServerTeam(insertTempoServerTeamDto);
+                log.info("Team {} created.", insertTempoServerTeamDto.getName());
 
-                String tempoTeamCloudLinksApi = dto.getSelf();
-                CloudLinksDto tempoTeamsCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoTeamCloudLinksApi);
-                if (tempoTeamsCloudLinksDto.getResults() != null) {
-                    for (CloudLinksResultsDto cloudLinksResultsDto : tempoTeamsCloudLinksDto.getResults()) {
-                        ServerAccountLinksDto insertTeamLinksDto = new ServerAccountLinksDto();
-                        insertTeamLinksDto.setAccountId(tempoServerTeam.getId());
-                        insertTeamLinksDto.setKey((tempoServerTeam.getKey()));
-                        insertTeamLinksDto.setLinkType("MANUAL");
-                        insertTeamLinksDto.setScope(cloudLinksResultsDto.getCloudLinksScopeDto().getId());
-                        insertTeamLinksDto.setScopeType(cloudLinksResultsDto.getCloudLinksScopeDto().getType());
 
-                        tempoServerConnector.insertTeamLinks(insertTeamLinksDto);
-                        log.info("Link to Project inserted: {} to {}", insertTeamLinksDto.getScope(), insertDto.getName());
+                // Tempo team member migration
+                String tempoCloudTeamMembersUrl = tempoCloudTeamDto.getCloudTeamResultsMembersDto().getSelf();
+                CloudTeamMembersDto tempoCloudTeamMembersListDto = tempoCloudConnector.getTempoCloudTeamMembers(tempoCloudTeamMembersUrl);
+                log.info(tempoCloudTeamMembersListDto.getMetaData().getCount().toString());
+
+                if (tempoCloudTeamMembersListDto != null) {
+                    for (CloudTeamMemberDto tempoCloudTeamMemberDto : tempoCloudTeamMembersListDto.getResults()) {
+
+                        ServerTeamMemberDto tempoServerTeamMemberDto = new ServerTeamMemberDto();
+
+                        ServerTeamMemberNameDto tempoServerTeamMemberNameDto = new ServerTeamMemberNameDto();
+                        if (tempoCloudTeamMemberDto != null &&
+                                tempoCloudTeamMemberDto.getCloudTeamResultsMemberDto() != null) {
+                            tempoServerTeamMemberNameDto.setName(tempoServiceUtil.getJiraServerUserKey(tempoCloudTeamMemberDto
+                                    .getCloudTeamResultsMemberDto().getDisplayName()));
+                        }
+                        tempoServerTeamMemberNameDto.setType("USER");
+                        tempoServerTeamMemberDto.setServerTeamMemberNameDto(tempoServerTeamMemberNameDto);
+
+                        ServerTeamMemberMembershipDto tempoServerTeamMemberMembershipDto = new ServerTeamMemberMembershipDto();
+                        ServerTeamMemberRoleDto tempoServerTeamMemberRoleDto = new ServerTeamMemberRoleDto();
+
+                        if (tempoCloudTeamMemberDto != null &&
+                                tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto() != null &&
+                                tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto().getCloudTeamResultsMembershipsActiveDto() != null) {
+                            tempoServerTeamMemberMembershipDto.setAvailability(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto()
+                                    .getCloudTeamResultsMembershipsActiveDto().getCommitmentPercent());
+                            tempoServerTeamMemberMembershipDto.setDateFrom(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto()
+                                    .getCloudTeamResultsMembershipsActiveDto().getFrom());
+                            tempoServerTeamMemberMembershipDto.setDateTo(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto()
+                                    .getCloudTeamResultsMembershipsActiveDto().getTo());
+
+                            tempoServerTeamMemberRoleDto.setId(tempoCloudTeamMemberDto.getCloudTeamResultsMembershipsDto()
+                                    .getCloudTeamResultsMembershipsActiveDto().getCloudTeamResultsMembershipsActiveRoleDto().getId());
+                        } else {
+                            tempoServerTeamMemberMembershipDto.setAvailability("");
+                            tempoServerTeamMemberMembershipDto.setDateFrom("");
+                            tempoServerTeamMemberMembershipDto.setDateTo("");
+
+                            tempoServerTeamMemberRoleDto.setId(0);
+                        }
+
+                        tempoServerTeamMemberMembershipDto.setServerTeamMemberRoleDto(tempoServerTeamMemberRoleDto);
+                        tempoServerTeamMemberDto.setServerTeamMemberMembershipDto(tempoServerTeamMemberMembershipDto);
+
+                        log.info(tempoServerTeamMemberDto.toString());
+
+                        //TODO team memberid serverisse teamide külge
+                        // Server maas - siit edasi testimata kood
+
+                        ServerTeamMemberInsertResponseDto tempoServerTeamMemeber = tempoServerConnector.insertTempoServerTeamMember
+                                (tempoServerTeamMemberDto, tempoServerTeam.getId());
+                        log.info("Team member {} inserted for team {}",
+                                tempoServerTeamMemberDto.getServerTeamMemberNameDto().getName(), tempoCloudTeamDto.getName());
                     }
-                }*/
+                }
             }
-        }
-    }
-
-    // Eraldi meetodid testimiseks. Hiljem kokku migrateTempoTeams() alla ja võib ära kustutada
-    public void tempoCloudTeams() {
-        TempoCloudTeamDto dto = tempoCloudConnector.getTempoCloudTeams();
-        log.info(dto.toString());
-    }
-
-    public void tempoServerTeams() {
-        ServerTeamResultsDto[] dto = tempoServerConnector.getTempoServerTeams();
-
-
-        log.info(String.valueOf(dto.length));
-    }
-
-    public void deleteTempoTeams() {
-        ServerTeamResultsDto[] deleteTempoServerTeamDto = tempoServerConnector.getTempoServerTeams();
-        for (int i = 0; i < deleteTempoServerTeamDto.length; i++) {
-            ServerTeamResultsDto dtoTeam = deleteTempoServerTeamDto[i];
-            tempoServerConnector.deleteTempoServerTeams(dtoTeam.getId());
-            log.info("Team {} deleted", dtoTeam.getName());
         }
     }
 }

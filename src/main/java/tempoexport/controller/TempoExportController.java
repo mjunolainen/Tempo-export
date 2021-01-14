@@ -18,18 +18,4 @@ public class TempoExportController {
 
     @GetMapping("migrateTempoTeams")
     public void migrateTempoTeams() {tempoTeamsService.migrateTempoTeams(); }
-
-    // Siit edasi testimiseks. Hiljem kustuta ära
-    @GetMapping("tempoCloudTeams")
-    public void getTempoCloudTeams() {
-        tempoTeamsService.tempoCloudTeams();
-    }
-
-    @GetMapping("tempoServerTeams")
-    public void getTempoServerTeams() {
-        tempoTeamsService.tempoServerTeams();
-    }
-
-    @GetMapping("deleteTempoTeams")
-    public void deleteTempoTeams() { tempoTeamsService.deleteTempoTeams(); }
 }

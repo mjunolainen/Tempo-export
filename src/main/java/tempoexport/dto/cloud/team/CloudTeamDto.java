@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class CloudTeamResultsDto {
+public class CloudTeamDto {
     String self;
     int id;
     String name;
     String summary;
     @JsonProperty("lead")
-    CloudTeamResultsLeadDto cloudTeamResultsLeadDto;
+    CloudTeamResultsUserDto cloudTeamResultsUserDto;
     @JsonProperty("program")
     CloudTeamResultsProgramDto cloudTeamResultsProgramDto;
     @JsonProperty("links")
