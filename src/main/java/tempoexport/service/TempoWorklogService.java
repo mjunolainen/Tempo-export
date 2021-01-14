@@ -25,45 +25,44 @@ public class TempoWorklogService {
     private TempoServiceUtil tempoServiceUtil;
 
     public void migrateTempoWorklogs() {
-        migrateWorklogs();
+
     }
 
     public void deleteTempoServerWorklogs() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 
-        TempoServerWorklogRequestDto tempoServerWorklogRequestDto = new TempoServerWorklogRequestDto();
-        log.info("From: {}", tempoServerWorklogRequestDto.getFrom());
-        log.info("To: {}", tempoServerWorklogRequestDto.getTo());
+        TempoServerWorklogRequestDto worklogRequestDates = new TempoServerWorklogRequestDto();
+        log.info("From: {}", worklogRequestDates.getFrom());
+        log.info("To: {}", worklogRequestDates.getTo());
 
-        while (LocalDate.parse(tempoServerWorklogRequestDto.getFrom(), formatter).isBefore(LocalDate.now())) {
-
-            TempoServerReturnWorklogDto[] tempoServerReturnWorklogDto = tempoServerConnector.getTempoServerWorklogs(tempoServerWorklogRequestDto);
-            log.info("Worklog count: {}", tempoServerReturnWorklogDto.length);
-            for (TempoServerReturnWorklogDto tempoServerWorklog : tempoServerReturnWorklogDto) {
-                log.info(tempoServerWorklog.getTempoWorklogId().toString());
-                // tempoServerConnector.deleteTempoServerWorklog(tempoServerWorklog.getTempoWorklogId());
-                // log.info("Worklog {} deleted", tempoServerWorklog.getTempoWorklogId());
+        while (LocalDate.parse(worklogRequestDates.getFrom(), formatter).isBefore(LocalDate.now())) {
+            //TODO hetkel ei ole sysadminil kustutamise õiguseid. Martin peab selle andma.
+            TempoServerReturnWorklogDto[] serverWorklogs = tempoServerConnector.getTempoServerWorklogs(worklogRequestDates);
+            log.info("Worklog count: {}", serverWorklogs.length);
+            for (TempoServerReturnWorklogDto serverWorklog : serverWorklogs) {
+                log.info(serverWorklog.getTempoWorklogId().toString());
+                // tempoServerConnector.deleteTempoServerWorklog(serverWorklog.getTempoWorklogId());
+                // log.info("Worklog {} deleted", serverWorklog.getTempoWorklogId());
             }
 
-            LocalDate currentDateTo = LocalDate.parse(tempoServerWorklogRequestDto.getTo(), formatter);
-
+            LocalDate currentDateTo = LocalDate.parse(worklogRequestDates.getTo(), formatter);
             String nextDateFrom = currentDateTo.toString();
             String nextDateTo = currentDateTo.plusMonths(1).toString();
 
-            tempoServerWorklogRequestDto.setFrom(nextDateFrom);
-            tempoServerWorklogRequestDto.setTo(nextDateTo);
+            worklogRequestDates.setFrom(nextDateFrom);
+            worklogRequestDates.setTo(nextDateTo);
 
-            log.info("From: {}", tempoServerWorklogRequestDto.getFrom());
-            log.info("To: {}", tempoServerWorklogRequestDto.getTo());
+            log.info("From: {}", worklogRequestDates.getFrom());
+            log.info("To: {}", worklogRequestDates.getTo());
         }
     }
 
     public void migrateWorklogs() {
-        CloudWorklogsListDto tempoCloudWorklogsList = tempoCloudConnector.getTempoCloudWorklogs();
+        CloudWorklogsListDto cloudWorklogsListDto = tempoCloudConnector.getTempoCloudWorklogs();
 
         //TODO tõsta while loopist välja ja kontrolli, kas worklogide serverisse lisamine töötab
-        //while (tempoCloudWorklogsList.getCloudWorklogsMetaDataDto().getNext() != null) {
-        for (CloudWorklogDto cloudWorklogDto : tempoCloudWorklogsList.getResults()) {
+        //while (cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext() != null) {
+        for (CloudWorklogDto cloudWorklogDto : cloudWorklogsListDto.getResults()) {
             ServerWorklogDto serverWorklogDto = new ServerWorklogDto();
 
             serverWorklogDto.setBillableSeconds(cloudWorklogDto.getBillableSeconds());
@@ -80,7 +79,7 @@ public class TempoWorklogService {
             ServerWorklogInsertResponseDto[] tempoServerWorklog = tempoServerConnector.insertTempoServerWorklog(serverWorklogDto);
             log.info("Worklog for task {} created", serverWorklogDto.getOriginTaskId());
         }
-        log.info(tempoCloudWorklogsList.getCloudWorklogsMetaDataDto().getNext());
-        tempoCloudWorklogsList = tempoCloudConnector.getNextTempoCloudWorklogs(tempoCloudWorklogsList.getCloudWorklogsMetaDataDto().getNext());
+        log.info(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
+        cloudWorklogsListDto = tempoCloudConnector.getNextTempoCloudWorklogs(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
     }
 }
