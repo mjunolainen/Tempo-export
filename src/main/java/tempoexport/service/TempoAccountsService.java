@@ -25,7 +25,6 @@ public class TempoAccountsService {
 
     public void migrateTempoAccounts() {
 
-        // Serveri accoundi linkide kustutamine
         TempoServerAccountDto[] tempoServerAccounts = tempoServerConnector.getTempoServerAccounts();
         for (int i = 0; i < tempoServerAccounts.length; i++) {
             TempoServerAccountDto tempoServerAccountDto = tempoServerAccounts[i];
@@ -37,7 +36,6 @@ public class TempoAccountsService {
             }
         }
 
-        // Serveri accountide kustutamine
         TempoServerAccountDto[] tempoServerAccountsDto = tempoServerConnector.getTempoServerAccounts();
         for (int i = 0; i < tempoServerAccountsDto.length; i++) {
             TempoServerAccountDto tempoServerAccountDto = tempoServerAccountsDto[i];

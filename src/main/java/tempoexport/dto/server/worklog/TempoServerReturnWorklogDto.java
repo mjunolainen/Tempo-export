@@ -2,14 +2,14 @@ package tempoexport.dto.server.worklog;
 
 import lombok.Data;
 
+
 @Data
-public class ServerWorklogDto {
+public class TempoServerReturnWorklogDto {
     Integer billableSeconds;
+    String timeSpent;
     String comment;
-    String endDate;
-    String originTaskId;
-    Integer remainingEstimate;
+    Integer tempoWorklogId;
     String started;
-    Integer timeSpentSeconds;
+    Integer originTaskId;
     String worker;
 }

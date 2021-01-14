@@ -16,9 +16,7 @@ import tempoexport.dto.server.team.ServerTeamDto;
 import tempoexport.dto.server.team.members.ServerTeamMemberDto;
 import tempoexport.dto.server.team.members.ServerTeamMemberInsertResponseDto;
 import tempoexport.dto.server.user.JiraServerUserResultsDto;
-import tempoexport.dto.server.worklog.ServerWorklogDto;
-import tempoexport.dto.server.worklog.ServerWorklogId;
-import tempoexport.dto.server.worklog.ServerWorklogInsertResponseDto;
+import tempoexport.dto.server.worklog.*;
 
 @Slf4j
 @Component
@@ -110,13 +108,17 @@ public class TempoServerConnector {
         }
     }
 
-    public ServerTeamMemberInsertResponseDto insertTempoServerTeamMember(ServerTeamMemberDto insertTeamMember, Integer teamId) {
+    public ServerTeamMemberInsertResponseDto insertTempoServerTeamMember(ServerTeamMemberDto insertTeamMember, Integer id) {
         try {
-            ResponseEntity<ServerTeamMemberInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "http://{JIRA_BASE_URL}/rest/tempo-teams/2/team/{teamId}/member",
-                    HttpMethod.POST, getEntityMember(insertTeamMember), ServerTeamMemberInsertResponseDto.class, teamId);
+            ResponseEntity<ServerTeamMemberInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team/{id}/member",
+                    HttpMethod.POST, getEntityMember(insertTeamMember), ServerTeamMemberInsertResponseDto.class, id);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
+            boolean b = sce.getStatusCode() == HttpStatus.BAD_REQUEST;
+            if (b == true) {
+                return null;
+            }
             throw new RuntimeException("Status code exception ", sce);
         }
     }
@@ -163,21 +165,11 @@ public class TempoServerConnector {
     }
 
     // TODO kontrolli, kas see päring sellisel kujul töötab. API dokumentatsiooni järgi ei saa mitut worklogi korraga küsida. Saab ainult id järgi ühte küsida.
-    public ServerWorklogId[] getTempoServerWorklogs() {
-        try {
-            ResponseEntity<ServerWorklogId[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/",
-                    HttpMethod.GET, getEntity(), ServerWorklogId[].class);
-            return usage.getBody();
-        } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
-            throw new RuntimeException("Status code exception ", sce);
-        }
-    }
 
     public ServerWorklogInsertResponseDto[] insertTempoServerWorklog(ServerWorklogDto insertWorklog) {
         try {
             ResponseEntity<ServerWorklogInsertResponseDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs",
-                    HttpMethod.POST, getEntityWorklog(insertWorklog), ServerWorklogInsertResponseDto[].class);
+                    HttpMethod.POST, getEntityInsertWorklogs(insertWorklog), ServerWorklogInsertResponseDto[].class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -185,7 +177,17 @@ public class TempoServerConnector {
         }
     }
 
-    public void deleteTempoServerWorklogs(Integer worklogId) {
+    public TempoServerReturnWorklogDto[] getTempoServerWorklogs(TempoServerWorklogRequestDto tempoServerWorklogRequestDto) {
+        try {
+            ResponseEntity<TempoServerReturnWorklogDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/search",
+                    HttpMethod.POST, getEntityWorklog(tempoServerWorklogRequestDto), TempoServerReturnWorklogDto[].class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public void deleteTempoServerWorklog(Integer worklogId) {
         try {
             restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/{worklogId}", HttpMethod.DELETE, getEntity(), void.class, worklogId);
         } catch (HttpStatusCodeException sce) {
@@ -230,7 +232,13 @@ public class TempoServerConnector {
         return httpEntity;
     }
 
-    private HttpEntity getEntityWorklog(ServerWorklogDto worklog) {
+    private HttpEntity getEntityWorklog(TempoServerWorklogRequestDto worklog) {
+        HttpHeaders headers = getHeaders();
+        HttpEntity httpEntity = new HttpEntity(worklog, headers);
+        return httpEntity;
+    }
+
+    private HttpEntity getEntityInsertWorklogs(ServerWorklogDto worklog) {
         HttpHeaders headers = getHeaders();
         HttpEntity httpEntity = new HttpEntity(worklog, headers);
         return httpEntity;
