@@ -16,6 +16,7 @@ import tempoexport.dto.server.team.ServerTeamDto;
 import tempoexport.dto.server.team.members.ServerTeamMemberDto;
 import tempoexport.dto.server.team.members.ServerTeamMemberInsertResponseDto;
 import tempoexport.dto.server.user.JiraServerUserResultsDto;
+import tempoexport.dto.server.worklog.*;
 
 @Slf4j
 @Component
@@ -39,7 +40,8 @@ public class TempoServerConnector {
 
     public TempoServerAccountDto[] getTempoServerAccounts() {
         try {
-            ResponseEntity<TempoServerAccountDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.GET, getEntity(), TempoServerAccountDto[].class);
+            ResponseEntity<TempoServerAccountDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account",
+                    HttpMethod.GET, getEntity(), TempoServerAccountDto[].class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -49,7 +51,8 @@ public class TempoServerConnector {
 
     public ServerAccountInsertResponseDto insertTempoServerAccount(ServerAccountDto insertAccount) {
         try {
-            ResponseEntity<ServerAccountInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account", HttpMethod.POST, getEntityAccount(insertAccount), ServerAccountInsertResponseDto.class);
+            ResponseEntity<ServerAccountInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account",
+                    HttpMethod.POST, getEntityAccount(insertAccount), ServerAccountInsertResponseDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -85,7 +88,8 @@ public class TempoServerConnector {
 
     public ServerTeamDto[] getTempoServerTeams() {
         try {
-            ResponseEntity<ServerTeamDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.GET, getEntity(), ServerTeamDto[].class);
+            ResponseEntity<ServerTeamDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team",
+                    HttpMethod.GET, getEntity(), ServerTeamDto[].class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -95,7 +99,8 @@ public class TempoServerConnector {
 
     public ServerTeamInsertResponseDto insertTempoServerTeam(ServerTeamDto insertTeam) {
         try {
-            ResponseEntity<ServerTeamInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team", HttpMethod.POST, getEntityTeam(insertTeam), ServerTeamInsertResponseDto.class);
+            ResponseEntity<ServerTeamInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team",
+                    HttpMethod.POST, getEntityTeam(insertTeam), ServerTeamInsertResponseDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -103,12 +108,17 @@ public class TempoServerConnector {
         }
     }
 
-    public ServerTeamMemberInsertResponseDto insertTempoServerTeamMember(ServerTeamMemberDto insertTeamMember, Integer teamId) {
+    public ServerTeamMemberInsertResponseDto insertTempoServerTeamMember(ServerTeamMemberDto insertTeamMember, Integer id) {
         try {
-            ResponseEntity<ServerTeamMemberInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "http://{JIRA_BASE_URL}/rest/tempo-teams/2/team/{teamId}/member", HttpMethod.POST, getEntityMember(insertTeamMember), ServerTeamMemberInsertResponseDto.class, teamId);
+            ResponseEntity<ServerTeamMemberInsertResponseDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team/{id}/member",
+                    HttpMethod.POST, getEntityMember(insertTeamMember), ServerTeamMemberInsertResponseDto.class, id);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
+            boolean b = sce.getStatusCode() == HttpStatus.BAD_REQUEST;
+            if (b == true) {
+                return null;
+            }
             throw new RuntimeException("Status code exception ", sce);
         }
     }
@@ -123,7 +133,8 @@ public class TempoServerConnector {
 
     public ServerAccountLinksDto insertServerTeamLinks(ServerAccountLinksDto insertLinksDto) {
         try {
-            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/1/link", HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
+            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/1/link",
+                    HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -133,7 +144,8 @@ public class TempoServerConnector {
 
     public ServerAccountLinksDto[] getTempoServerSingleAccountLinks(Integer accountId) {
         try {
-            ResponseEntity<ServerAccountLinksDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{accountId}/link", HttpMethod.GET, getEntity(), ServerAccountLinksDto[].class, accountId);
+            ResponseEntity<ServerAccountLinksDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account/{accountId}/link",
+                    HttpMethod.GET, getEntity(), ServerAccountLinksDto[].class, accountId);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
@@ -143,10 +155,42 @@ public class TempoServerConnector {
 
     public JiraServerUserResultsDto[] getJiraServerUsers() {
         try {
-            ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=" + jiraServerMaxUsers, HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
+            ResponseEntity<JiraServerUserResultsDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/api/2/user/search?username=.&amp;startAt=0&maxResults=" + jiraServerMaxUsers,
+                    HttpMethod.GET, getEntity(), JiraServerUserResultsDto[].class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    // TODO kontrolli, kas see päring sellisel kujul töötab. API dokumentatsiooni järgi ei saa mitut worklogi korraga küsida. Saab ainult id järgi ühte küsida.
+
+    public ServerWorklogInsertResponseDto[] insertTempoServerWorklog(ServerWorklogDto insertWorklog) {
+        try {
+            ResponseEntity<ServerWorklogInsertResponseDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs",
+                    HttpMethod.POST, getEntityInsertWorklogs(insertWorklog), ServerWorklogInsertResponseDto[].class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            log.error("Status Code exception {}", sce);
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public TempoServerReturnWorklogDto[] getTempoServerWorklogs(TempoServerWorklogRequestDto tempoServerWorklogRequestDto) {
+        try {
+            ResponseEntity<TempoServerReturnWorklogDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/search",
+                    HttpMethod.POST, getEntityWorklog(tempoServerWorklogRequestDto), TempoServerReturnWorklogDto[].class);
+            return usage.getBody();
+        } catch (HttpStatusCodeException sce) {
+            throw new RuntimeException("Status code exception ", sce);
+        }
+    }
+
+    public void deleteTempoServerWorklog(Integer worklogId) {
+        try {
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/{worklogId}", HttpMethod.DELETE, getEntity(), void.class, worklogId);
+        } catch (HttpStatusCodeException sce) {
             throw new RuntimeException("Status code exception ", sce);
         }
     }
@@ -185,6 +229,18 @@ public class TempoServerConnector {
     private HttpEntity getEntityLinks(ServerAccountLinksDto insertLinksDto) {
         HttpHeaders headers = getHeaders();
         HttpEntity httpEntity = new HttpEntity(insertLinksDto, headers);
+        return httpEntity;
+    }
+
+    private HttpEntity getEntityWorklog(TempoServerWorklogRequestDto worklog) {
+        HttpHeaders headers = getHeaders();
+        HttpEntity httpEntity = new HttpEntity(worklog, headers);
+        return httpEntity;
+    }
+
+    private HttpEntity getEntityInsertWorklogs(ServerWorklogDto worklog) {
+        HttpHeaders headers = getHeaders();
+        HttpEntity httpEntity = new HttpEntity(worklog, headers);
         return httpEntity;
     }
 }
