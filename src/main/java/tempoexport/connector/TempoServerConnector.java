@@ -38,6 +38,14 @@ public class TempoServerConnector {
     private Integer jiraServerMaxUsers;
 
 
+    public Integer serverWorklogDeletionErrorCounter403 = 0;
+    public Integer serverWorklogDeletionErrorCounter500 = 0;
+    public Integer serverWorklogInsertionErrorCounter403 = 0;
+    public Integer serverWorklogInsertionErrorCounter400 = 0;
+    public Integer serverWorklogInsertionErrorCounter500 = 0;
+    public Integer serverWorklogUsersWithoutName = 0;
+    public Integer worklogsCreated = 0;
+
     public TempoServerAccountDto[] getTempoServerAccounts() {
         try {
             ResponseEntity<TempoServerAccountDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-accounts/1/account",
@@ -115,8 +123,7 @@ public class TempoServerConnector {
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
-            boolean b = sce.getStatusCode() == HttpStatus.BAD_REQUEST;
-            if (b == true) {
+            if (sce.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 return null;
             }
             throw new RuntimeException("Status code exception ", sce);
@@ -164,16 +171,32 @@ public class TempoServerConnector {
         }
     }
 
-    // TODO kontrolli, kas see päring sellisel kujul töötab. API dokumentatsiooni järgi ei saa mitut worklogi korraga küsida. Saab ainult id järgi ühte küsida.
-
-    public ServerWorklogInsertResponseDto[] insertTempoServerWorklog(ServerWorklogDto insertWorklog) {
+    public boolean insertTempoServerWorklog(ServerWorklogDto insertWorklog) {
         try {
-            ResponseEntity<ServerWorklogInsertResponseDto[]> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs",
-                    HttpMethod.POST, getEntityInsertWorklogs(insertWorklog), ServerWorklogInsertResponseDto[].class);
-            return usage.getBody();
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs",
+                    HttpMethod.POST, getEntityInsertWorklogs(insertWorklog), void.class);
+            worklogsCreated++;
+            return true;
         } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
-            throw new RuntimeException("Status code exception ", sce);
+            if (sce.getStatusCode() == HttpStatus.FORBIDDEN) {
+                log.error(sce.getStatusCode().toString());
+                log.error(sce.getMessage());
+                serverWorklogInsertionErrorCounter403++;
+                log.info("Total 403 errors: {}", serverWorklogInsertionErrorCounter403);
+            }
+            if (sce.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                log.error(sce.getStatusCode().toString());
+                log.error(sce.getMessage());
+                serverWorklogInsertionErrorCounter400++;
+                log.info("Total 400 errors: {}", serverWorklogInsertionErrorCounter400);
+            }
+            if (sce.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+                log.error(sce.getStatusCode().toString());
+                log.error(sce.getMessage());
+                serverWorklogInsertionErrorCounter500++;
+                log.info("Total 500 errors: {}", serverWorklogInsertionErrorCounter500);
+            }
+            return false;
         }
     }
 
@@ -187,11 +210,25 @@ public class TempoServerConnector {
         }
     }
 
-    public void deleteTempoServerWorklog(Integer worklogId) {
+    public boolean deleteTempoServerWorklog(Integer worklogId) {
         try {
-            restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/{worklogId}", HttpMethod.DELETE, getEntity(), void.class, worklogId);
+            restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/{worklogId}",
+                    HttpMethod.DELETE, getEntity(), void.class, worklogId);
+            return true;
         } catch (HttpStatusCodeException sce) {
-            throw new RuntimeException("Status code exception ", sce);
+            if (sce.getStatusCode() == HttpStatus.FORBIDDEN) {
+                log.error(sce.getStatusCode().toString());
+                log.error(sce.getMessage());
+                serverWorklogDeletionErrorCounter403++;
+                log.info("Total 403 errors: {}", serverWorklogDeletionErrorCounter403);
+            }
+            if (sce.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
+                log.error(sce.getStatusCode().toString());
+                log.error(sce.getMessage());
+                serverWorklogDeletionErrorCounter500++;
+                log.info("Total 500 errors: {}", serverWorklogDeletionErrorCounter500);
+            }
+            return false;
         }
     }
 

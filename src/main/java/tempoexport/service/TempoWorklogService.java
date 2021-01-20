@@ -3,6 +3,7 @@ package tempoexport.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tempoexport.connector.TempoCloudConnector;
 import tempoexport.connector.TempoServerConnector;
@@ -24,11 +25,14 @@ public class TempoWorklogService {
     @Autowired
     private TempoServiceUtil tempoServiceUtil;
 
-    public void migrateTempoWorklogs() {
+    @Value("${jira.cloud.get.worklogs.count}")
+    private Integer cloudWorklogsCount;
 
+    public void migrateTempoWorklogs() {
     }
 
     public void deleteTempoServerWorklogs() {
+        Integer worklogCount = 0;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 
         TempoServerWorklogRequestDto worklogRequestDates = new TempoServerWorklogRequestDto();
@@ -36,13 +40,16 @@ public class TempoWorklogService {
         log.info("To: {}", worklogRequestDates.getTo());
 
         while (LocalDate.parse(worklogRequestDates.getFrom(), formatter).isBefore(LocalDate.now())) {
-            //TODO hetkel ei ole sysadminil kustutamise õiguseid. Martin peab selle andma.
             TempoServerReturnWorklogDto[] serverWorklogs = tempoServerConnector.getTempoServerWorklogs(worklogRequestDates);
-            log.info("Worklog count: {}", serverWorklogs.length);
+            log.info("Period worklog count: {}", serverWorklogs.length);
+            worklogCount = worklogCount + serverWorklogs.length;
             for (TempoServerReturnWorklogDto serverWorklog : serverWorklogs) {
-                log.info(serverWorklog.getTempoWorklogId().toString());
-                // tempoServerConnector.deleteTempoServerWorklog(serverWorklog.getTempoWorklogId());
-                // log.info("Worklog {} deleted", serverWorklog.getTempoWorklogId());
+                log.info("Worklog id: {}", serverWorklog.getTempoWorklogId().toString());
+                boolean deletedWorklog = tempoServerConnector.deleteTempoServerWorklog(serverWorklog.getTempoWorklogId());
+                if (deletedWorklog == true) {
+                    log.info("Worklog {} deleted", serverWorklog.getTempoWorklogId());
+                    worklogCount--;
+                }
             }
 
             LocalDate currentDateTo = LocalDate.parse(worklogRequestDates.getTo(), formatter);
@@ -55,19 +62,25 @@ public class TempoWorklogService {
             log.info("From: {}", worklogRequestDates.getFrom());
             log.info("To: {}", worklogRequestDates.getTo());
         }
+
+        log.info("Total worklogs left in server: {}", worklogCount);
+        log.info("Total 403 errors: {}", tempoServerConnector.serverWorklogDeletionErrorCounter403);
+        log.info("Total 500 errors: {}", tempoServerConnector.serverWorklogDeletionErrorCounter500);
+
+        tempoServerConnector.serverWorklogDeletionErrorCounter500 = 0;
+        tempoServerConnector.serverWorklogDeletionErrorCounter403 = 0;
     }
 
     public void migrateWorklogs() {
         CloudWorklogsListDto cloudWorklogsListDto = tempoCloudConnector.getTempoCloudWorklogs();
 
-        //TODO tõsta while loopist välja ja kontrolli, kas worklogide serverisse lisamine töötab
         //while (cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext() != null) {
         for (CloudWorklogDto cloudWorklogDto : cloudWorklogsListDto.getResults()) {
             ServerWorklogDto serverWorklogDto = new ServerWorklogDto();
 
             serverWorklogDto.setBillableSeconds(cloudWorklogDto.getBillableSeconds());
             serverWorklogDto.setComment(cloudWorklogDto.getDescription());
-            if (serverWorklogDto.getComment() == null) {
+            if (serverWorklogDto.getComment() == null || serverWorklogDto.getComment().isEmpty()) {
                 serverWorklogDto.setComment(".");
             }
             serverWorklogDto.setStarted(cloudWorklogDto.getStartDate());
@@ -76,10 +89,24 @@ public class TempoWorklogService {
             serverWorklogDto.setWorker(tempoServiceUtil.getJiraServerUserKey(cloudWorklogDto.getCloudWorklogAuthorDto().getDisplayName()));
             log.info(serverWorklogDto.toString());
 
-            ServerWorklogInsertResponseDto[] tempoServerWorklog = tempoServerConnector.insertTempoServerWorklog(serverWorklogDto);
-            log.info("Worklog for task {} created", serverWorklogDto.getOriginTaskId());
+            if (serverWorklogDto.getWorker() != null) {
+                boolean tempoServerWorklog = tempoServerConnector.insertTempoServerWorklog(serverWorklogDto);
+                if (tempoServerWorklog == true) {
+                    log.info("Worklog for task {} created", serverWorklogDto.getOriginTaskId());
+                } else {
+                    tempoServerConnector.serverWorklogUsersWithoutName++;
+                    log.info("Worker not existing: unable to create worklog for issue {}", cloudWorklogDto.getCloudWorklogIssueDto().getKey());
+                }
+            }
         }
-        log.info(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
+        log.info("Worklogs from cloud: {}", cloudWorklogsCount);
+        log.info("Total server worklogs created: {}", tempoServerConnector.worklogsCreated);
+        log.info("Total invalid users: {}", tempoServerConnector.serverWorklogUsersWithoutName);
+        log.info("Total 400 errors: {}", tempoServerConnector.serverWorklogInsertionErrorCounter400);
+        log.info("Total 403 errors: {}", tempoServerConnector.serverWorklogInsertionErrorCounter403);
+        log.info("Total 500 errors: {}", tempoServerConnector.serverWorklogInsertionErrorCounter500);
+
+        //log.info(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
         cloudWorklogsListDto = tempoCloudConnector.getNextTempoCloudWorklogs(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
     }
 }

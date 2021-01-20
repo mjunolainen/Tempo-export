@@ -26,6 +26,10 @@ public class TempoCloudConnector {
     @Value("${tempo.token}")
     private String token;
 
+    @Value("${jira.cloud.get.worklogs.count}")
+    private Integer cloudWorklogsCount;
+
+
     public TempoCloudAccountDto getTempoCloudAccounts() {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -88,7 +92,7 @@ public class TempoCloudConnector {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(token);
             HttpEntity httpEntity = new HttpEntity<>(null, headers);
-            ResponseEntity<CloudWorklogsListDto> usage = restTemplate.exchange(tempoCloudUrl + "/worklogs/?offset=0&limit=10", HttpMethod.GET, httpEntity, CloudWorklogsListDto.class);
+            ResponseEntity<CloudWorklogsListDto> usage = restTemplate.exchange(tempoCloudUrl + "/worklogs/?offset=0&limit=" + cloudWorklogsCount, HttpMethod.GET, httpEntity, CloudWorklogsListDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);
