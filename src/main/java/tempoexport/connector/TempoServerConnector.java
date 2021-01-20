@@ -182,19 +182,19 @@ public class TempoServerConnector {
                 log.error(sce.getStatusCode().toString());
                 log.error(sce.getMessage());
                 serverWorklogInsertionErrorCounter403++;
-                log.info("Total 403 errors: {}", serverWorklogInsertionErrorCounter403);
+                //log.info("Total 403 errors: {}", serverWorklogInsertionErrorCounter403);
             }
             if (sce.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 log.error(sce.getStatusCode().toString());
                 log.error(sce.getMessage());
                 serverWorklogInsertionErrorCounter400++;
-                log.info("Total 400 errors: {}", serverWorklogInsertionErrorCounter400);
+                //log.info("Total 400 errors: {}", serverWorklogInsertionErrorCounter400);
             }
             if (sce.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
                 log.error(sce.getStatusCode().toString());
                 log.error(sce.getMessage());
                 serverWorklogInsertionErrorCounter500++;
-                log.info("Total 500 errors: {}", serverWorklogInsertionErrorCounter500);
+                //log.info("Total 500 errors: {}", serverWorklogInsertionErrorCounter500);
             }
             return false;
         }
