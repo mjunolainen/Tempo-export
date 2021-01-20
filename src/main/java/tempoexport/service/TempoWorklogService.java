@@ -33,6 +33,7 @@ public class TempoWorklogService {
 
     public void deleteTempoServerWorklogs() {
         Integer worklogCount = 0;
+        Integer deletedWorklogs = 0;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 
         TempoServerWorklogRequestDto worklogRequestDates = new TempoServerWorklogRequestDto();
@@ -49,6 +50,7 @@ public class TempoWorklogService {
                 if (deletedWorklog == true) {
                     log.info("Worklog {} deleted", serverWorklog.getTempoWorklogId());
                     worklogCount--;
+                    deletedWorklogs++;
                 }
             }
 
@@ -62,7 +64,7 @@ public class TempoWorklogService {
             log.info("From: {}", worklogRequestDates.getFrom());
             log.info("To: {}", worklogRequestDates.getTo());
         }
-
+        log.info("Worklogs deleted: {}", deletedWorklogs);
         log.info("Total worklogs left in server: {}", worklogCount);
         log.info("Total 403 errors: {}", tempoServerConnector.serverWorklogDeletionErrorCounter403);
         log.info("Total 500 errors: {}", tempoServerConnector.serverWorklogDeletionErrorCounter500);
