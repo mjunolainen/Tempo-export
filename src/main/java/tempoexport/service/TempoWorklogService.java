@@ -78,6 +78,7 @@ public class TempoWorklogService {
         LocalTime timeStart = LocalTime.now();
         Integer worklogCountFromCloud = 0;
 
+
         CloudWorklogsListDto cloudWorklogsListDto = tempoCloudConnector.getTempoCloudWorklogs();
 
         while (cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext() != null) {
@@ -107,6 +108,14 @@ public class TempoWorklogService {
                     tempoServerConnector.serverWorklogUsersWithoutName++;
                     log.info("Worker not existing: unable to create worklog for issue {}", cloudWorklogDto.getCloudWorklogIssueDto().getKey());
                 }
+                // selle muutujaga tuleb natuke mängida
+              try {
+                Thread.sleep(100); // maga 100 millisekundit
+              }
+              catch (InterruptedException e) {
+                log.error("Siia loodetavasti ei jõua kunagi");
+                e.printStackTrace();
+              }
             }
             cloudWorklogsListDto = tempoCloudConnector.getNextTempoCloudWorklogs(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
             log.info("Worklogs from cloud: {}", worklogCountFromCloud);

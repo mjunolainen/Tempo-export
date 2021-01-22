@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -171,6 +172,7 @@ public class TempoServerConnector {
         }
     }
 
+    @Async
     public boolean insertTempoServerWorklog(ServerWorklogDto insertWorklog) {
         try {
             restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs",
@@ -179,6 +181,7 @@ public class TempoServerConnector {
             return true;
         } catch (HttpStatusCodeException sce) {
             if (sce.getStatusCode() == HttpStatus.FORBIDDEN) {
+              // nüüd sa peaks logima siin ka mingit worklogi infot - insertWorklog.getMidagi()
                 log.error(sce.getStatusCode().toString());
                 log.error(sce.getMessage());
                 serverWorklogInsertionErrorCounter403++;
