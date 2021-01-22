@@ -27,7 +27,7 @@ public class TempoExportController {
 
     //
 
-    @GetMapping("deleteTempoServerWorklogs")
+        @GetMapping("deleteTempoServerWorklogs")
     public void getTempoServerWorklogs() {tempoWorklogService.deleteTempoServerWorklogs(); }
 
     @GetMapping("migrateWorklogs")

@@ -11,7 +11,6 @@ import tempoexport.dto.cloud.worklog.CloudWorklogDto;
 import tempoexport.dto.cloud.worklog.CloudWorklogsListDto;
 import tempoexport.dto.server.worklog.*;
 
-import javax.xml.stream.events.EndDocument;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -78,12 +77,14 @@ public class TempoWorklogService {
     public void migrateWorklogs() {
         LocalTime timeStart = LocalTime.now();
         Integer worklogCountFromCloud = 0;
+
         CloudWorklogsListDto cloudWorklogsListDto = tempoCloudConnector.getTempoCloudWorklogs();
 
         while (cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext() != null) {
             worklogCountFromCloud = worklogCountFromCloud + cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getCount();
 
             for (CloudWorklogDto cloudWorklogDto : cloudWorklogsListDto.getResults()) {
+
                 ServerWorklogDto serverWorklogDto = new ServerWorklogDto();
 
                 serverWorklogDto.setBillableSeconds(cloudWorklogDto.getBillableSeconds());
@@ -111,6 +112,7 @@ public class TempoWorklogService {
             log.info("Worklogs from cloud: {}", worklogCountFromCloud);
 
         }
+
         LocalTime timeEnd = LocalTime.now();
 
         log.info("Start time: {}", timeStart);
