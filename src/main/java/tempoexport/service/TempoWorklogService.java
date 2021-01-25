@@ -82,14 +82,16 @@ public class TempoWorklogService {
     public void migrateWorklogs() {
         LocalTime timeStart = LocalTime.now();
         Integer worklogCountFromCloud = 0;
+        Integer serverWorklogUsersWithoutName = 0;
 
 
         CloudWorklogsListDto cloudWorklogsListDto = tempoCloudConnector.getTempoCloudWorklogs();
+        log.info(cloudWorklogsListDto.getSelf());
 
         while (cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext() != null) {
             worklogCountFromCloud = worklogCountFromCloud + cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getCount();
 
-            for (CloudWorklogDto cloudWorklogDto : cloudWorklogsListDto.getResults()) {
+           for (CloudWorklogDto cloudWorklogDto : cloudWorklogsListDto.getResults()) {
                 ServerWorklogDto serverWorklogDto = new ServerWorklogDto();
 
                 serverWorklogDto.setBillableSeconds(cloudWorklogDto.getBillableSeconds());
@@ -107,8 +109,8 @@ public class TempoWorklogService {
                 if (serverWorklogDto.getWorker() != null) {
                     tempoServerConnector.insertTempoServerWorklog(serverWorklogDto);
                 } else {
-                    tempoServerConnector.serverWorklogUsersWithoutName++;
-                    log.info("Worker not existing: unable to create worklog for issue {}", cloudWorklogDto.getCloudWorklogIssueDto().getKey());
+                    serverWorklogUsersWithoutName++;
+                    //log.info("Worker not existing: unable to create worklog for issue {}", cloudWorklogDto.getCloudWorklogIssueDto().getKey());
                 }
                 try {
                     Thread.sleep(100); // maga 100 millisekundit
@@ -116,17 +118,16 @@ public class TempoWorklogService {
                     log.error("Siia loodetavasti ei jõua kunagi");
                     e.printStackTrace();
                 }
-
-                cloudWorklogsListDto = tempoCloudConnector.getNextTempoCloudWorklogs(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
-                log.info("Worklogs from cloud: {}", worklogCountFromCloud);
             }
+            log.info(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
+            cloudWorklogsListDto = tempoCloudConnector.getNextTempoCloudWorklogs(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
         }
         LocalTime timeEnd = LocalTime.now();
 
         log.info("Start time: {}", timeStart);
         log.info("End time: {}", timeEnd);
         log.info("Total server worklogs created: {}", tempoServerConnector.worklogsCreated);
-        log.info("Total invalid users: {}", tempoServerConnector.serverWorklogUsersWithoutName);
+        log.info("Total invalid users: {}", serverWorklogUsersWithoutName);
         log.info("Total 400 errors: {}", tempoServerConnector.serverWorklogInsertionErrorCounter400);
         log.info("Total 403 errors: {}", tempoServerConnector.serverWorklogInsertionErrorCounter403);
         log.info("Total 500 errors: {}", tempoServerConnector.serverWorklogInsertionErrorCounter500);

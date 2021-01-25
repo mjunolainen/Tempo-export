@@ -93,7 +93,7 @@ public class TempoCloudConnector {
             headers.setBearerAuth(token);
             HttpEntity httpEntity = new HttpEntity<>(null, headers);
             //ResponseEntity<CloudWorklogsListDto> usage = restTemplate.exchange(tempoCloudUrl + "/worklogs/?offset=0&limit=" + cloudWorklogsCount, HttpMethod.GET, httpEntity, CloudWorklogsListDto.class);
-            ResponseEntity<CloudWorklogsListDto> usage = restTemplate.exchange(tempoCloudUrl + "/worklogs/?offset=0&from=2020-12-01&to=2020-12-31&limit=100", HttpMethod.GET, httpEntity, CloudWorklogsListDto.class);
+            ResponseEntity<CloudWorklogsListDto> usage = restTemplate.exchange(tempoCloudUrl + "/worklogs/?offset=0&from=2020-12-01&to=2020-12-31&limit=1000", HttpMethod.GET, httpEntity, CloudWorklogsListDto.class);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
             log.error("Status Code exception {}", sce);

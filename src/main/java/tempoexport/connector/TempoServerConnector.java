@@ -44,7 +44,6 @@ public class TempoServerConnector {
     public Integer serverWorklogInsertionErrorCounter403 = 0;
     public Integer serverWorklogInsertionErrorCounter400 = 0;
     public Integer serverWorklogInsertionErrorCounter500 = 0;
-    public Integer serverWorklogUsersWithoutName = 0;
     public Integer worklogsCreated = 0;
     public Integer deletedServerWorklogs = 0;
     public Integer worklogsNotDeletedFromServer = 0;
