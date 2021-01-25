@@ -33,8 +33,7 @@ public class TempoWorklogService {
     }
 
     public void deleteTempoServerWorklogs() {
-        Integer worklogCount = 0;
-        Integer deletedWorklogs = 0;
+        LocalTime timeStart = LocalTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 
         TempoServerWorklogRequestDto worklogRequestDates = new TempoServerWorklogRequestDto();
@@ -44,14 +43,14 @@ public class TempoWorklogService {
         while (LocalDate.parse(worklogRequestDates.getFrom(), formatter).isBefore(LocalDate.now())) {
             TempoServerReturnWorklogDto[] serverWorklogs = tempoServerConnector.getTempoServerWorklogs(worklogRequestDates);
             log.info("Period worklog count: {}", serverWorklogs.length);
-            worklogCount = worklogCount + serverWorklogs.length;
+            //worklogCount = worklogCount + serverWorklogs.length;
             for (TempoServerReturnWorklogDto serverWorklog : serverWorklogs) {
-                log.info("Worklog id: {}", serverWorklog.getTempoWorklogId().toString());
-                boolean deletedWorklog = tempoServerConnector.deleteTempoServerWorklog(serverWorklog.getTempoWorklogId());
-                if (deletedWorklog == true) {
-                    log.info("Worklog {} deleted", serverWorklog.getTempoWorklogId());
-                    worklogCount--;
-                    deletedWorklogs++;
+                tempoServerConnector.deleteTempoServerWorklog(serverWorklog.getTempoWorklogId());
+                try {
+                    Thread.sleep(30); // maga 100 millisekundit
+                } catch (InterruptedException e) {
+                    log.error("Siia loodetavasti ei jõua kunagi");
+                    e.printStackTrace();
                 }
             }
 
@@ -62,11 +61,17 @@ public class TempoWorklogService {
             worklogRequestDates.setFrom(nextDateFrom);
             worklogRequestDates.setTo(nextDateTo);
 
+            log.info("Deleted worklogs: {}", tempoServerConnector.deletedServerWorklogs);
+            log.info("Worklogs left in server: {}", tempoServerConnector.worklogsNotDeletedFromServer);
             log.info("From: {}", worklogRequestDates.getFrom());
             log.info("To: {}", worklogRequestDates.getTo());
         }
-        log.info("Worklogs deleted: {}", deletedWorklogs);
-        log.info("Total worklogs left in server: {}", worklogCount);
+        LocalTime timeEnd = LocalTime.now();
+
+        log.info("Start time: {}", timeStart);
+        log.info("End time: {}", timeEnd);
+        log.info("Worklogs deleted: {}", tempoServerConnector.deletedServerWorklogs);
+        log.info("Total worklogs left in server: {}", tempoServerConnector.worklogsNotDeletedFromServer);
         log.info("Total 403 errors: {}", tempoServerConnector.serverWorklogDeletionErrorCounter403);
         log.info("Total 500 errors: {}", tempoServerConnector.serverWorklogDeletionErrorCounter500);
 
@@ -85,43 +90,37 @@ public class TempoWorklogService {
             worklogCountFromCloud = worklogCountFromCloud + cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getCount();
 
             for (CloudWorklogDto cloudWorklogDto : cloudWorklogsListDto.getResults()) {
-
                 ServerWorklogDto serverWorklogDto = new ServerWorklogDto();
 
                 serverWorklogDto.setBillableSeconds(cloudWorklogDto.getBillableSeconds());
                 serverWorklogDto.setComment(cloudWorklogDto.getDescription());
+
                 if (serverWorklogDto.getComment() == null || serverWorklogDto.getComment().isEmpty()) {
                     serverWorklogDto.setComment(".");
                 }
+
                 serverWorklogDto.setStarted(cloudWorklogDto.getStartDate());
                 serverWorklogDto.setTimeSpentSeconds(cloudWorklogDto.getTimeSpentSeconds());
                 serverWorklogDto.setOriginTaskId(cloudWorklogDto.getCloudWorklogIssueDto().getKey());
                 serverWorklogDto.setWorker(tempoServiceUtil.getJiraServerUserKey(cloudWorklogDto.getCloudWorklogAuthorDto().getDisplayName()));
-                log.info(serverWorklogDto.toString());
 
                 if (serverWorklogDto.getWorker() != null) {
-                    boolean tempoServerWorklog = tempoServerConnector.insertTempoServerWorklog(serverWorklogDto);
-                    if (tempoServerWorklog == true) {
-                        log.info("Worklog for task {} created", serverWorklogDto.getOriginTaskId());
-                    }
+                    tempoServerConnector.insertTempoServerWorklog(serverWorklogDto);
                 } else {
                     tempoServerConnector.serverWorklogUsersWithoutName++;
                     log.info("Worker not existing: unable to create worklog for issue {}", cloudWorklogDto.getCloudWorklogIssueDto().getKey());
                 }
-                // selle muutujaga tuleb natuke mängida
-              try {
-                Thread.sleep(100); // maga 100 millisekundit
-              }
-              catch (InterruptedException e) {
-                log.error("Siia loodetavasti ei jõua kunagi");
-                e.printStackTrace();
-              }
+                try {
+                    Thread.sleep(100); // maga 100 millisekundit
+                } catch (InterruptedException e) {
+                    log.error("Siia loodetavasti ei jõua kunagi");
+                    e.printStackTrace();
+                }
+
+                cloudWorklogsListDto = tempoCloudConnector.getNextTempoCloudWorklogs(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
+                log.info("Worklogs from cloud: {}", worklogCountFromCloud);
             }
-            cloudWorklogsListDto = tempoCloudConnector.getNextTempoCloudWorklogs(cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext());
-            log.info("Worklogs from cloud: {}", worklogCountFromCloud);
-
         }
-
         LocalTime timeEnd = LocalTime.now();
 
         log.info("Start time: {}", timeStart);

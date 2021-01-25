@@ -46,6 +46,9 @@ public class TempoServerConnector {
     public Integer serverWorklogInsertionErrorCounter500 = 0;
     public Integer serverWorklogUsersWithoutName = 0;
     public Integer worklogsCreated = 0;
+    public Integer deletedServerWorklogs = 0;
+    public Integer worklogsNotDeletedFromServer = 0;
+
 
     public TempoServerAccountDto[] getTempoServerAccounts() {
         try {
@@ -173,7 +176,7 @@ public class TempoServerConnector {
     }
 
     @Async
-    public boolean insertTempoServerWorklog(ServerWorklogDto insertWorklog) {
+    public Boolean insertTempoServerWorklog(ServerWorklogDto insertWorklog) {
         try {
             restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs",
                     HttpMethod.POST, getEntityInsertWorklogs(insertWorklog), void.class);
@@ -181,23 +184,13 @@ public class TempoServerConnector {
             return true;
         } catch (HttpStatusCodeException sce) {
             if (sce.getStatusCode() == HttpStatus.FORBIDDEN) {
-              // nüüd sa peaks logima siin ka mingit worklogi infot - insertWorklog.getMidagi()
-                log.error(sce.getStatusCode().toString());
-                log.error(sce.getMessage());
                 serverWorklogInsertionErrorCounter403++;
-                log.info("Total 403 errors: {}", serverWorklogInsertionErrorCounter403);
             }
             if (sce.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                log.error(sce.getStatusCode().toString());
-                log.error(sce.getMessage());
                 serverWorklogInsertionErrorCounter400++;
-                log.info("Total 400 errors: {}", serverWorklogInsertionErrorCounter400);
             }
             if (sce.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
-                log.error(sce.getStatusCode().toString());
-                log.error(sce.getMessage());
                 serverWorklogInsertionErrorCounter500++;
-                log.info("Total 500 errors: {}", serverWorklogInsertionErrorCounter500);
             }
             return false;
         }
@@ -213,24 +206,21 @@ public class TempoServerConnector {
         }
     }
 
-    public boolean deleteTempoServerWorklog(Integer worklogId) {
+    @Async
+    public Boolean deleteTempoServerWorklog(Integer worklogId) {
         try {
             restTemplate.exchange(tempoServerUrl + "/rest/tempo-timesheets/4/worklogs/{worklogId}",
                     HttpMethod.DELETE, getEntity(), void.class, worklogId);
+            deletedServerWorklogs++;
             return true;
         } catch (HttpStatusCodeException sce) {
             if (sce.getStatusCode() == HttpStatus.FORBIDDEN) {
-                log.error(sce.getStatusCode().toString());
-                log.error(sce.getMessage());
                 serverWorklogDeletionErrorCounter403++;
-                log.info("Total 403 errors: {}", serverWorklogDeletionErrorCounter403);
             }
             if (sce.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR) {
-                log.error(sce.getStatusCode().toString());
-                log.error(sce.getMessage());
                 serverWorklogDeletionErrorCounter500++;
-                log.info("Total 500 errors: {}", serverWorklogDeletionErrorCounter500);
             }
+            worklogsNotDeletedFromServer++;
             return false;
         }
     }
