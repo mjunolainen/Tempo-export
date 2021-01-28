@@ -23,7 +23,7 @@ public class TempoAccountsService {
     @Autowired
     private TempoServiceUtil tempoServiceUtil;
 
-    public void migrateTempoAccounts() {
+    public String migrateTempoAccounts() {
 
         TempoServerAccountDto[] tempoServerAccounts = tempoServerConnector.getTempoServerAccounts();
         for (int i = 0; i < tempoServerAccounts.length; i++) {
@@ -104,5 +104,6 @@ public class TempoAccountsService {
                 }
             }
         }
+        return "Accounts migrated";
     }
 }

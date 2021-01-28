@@ -25,7 +25,7 @@ public class TempoTeamsService {
     @Autowired
     private TempoServiceUtil tempoServiceUtil;
 
-    public void migrateTempoTeams() {
+    public String migrateTempoTeams() {
 
         ServerTeamDto[] tempoServerTeams = tempoServerConnector.getTempoServerTeams();
         for (int i = 0; i < tempoServerTeams.length; i++) {
@@ -109,5 +109,6 @@ public class TempoTeamsService {
                 }
             }
         }
+        return "Teams migrated";
     }
 }
