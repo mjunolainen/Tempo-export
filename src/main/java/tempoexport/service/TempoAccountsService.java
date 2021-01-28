@@ -43,14 +43,14 @@ public class TempoAccountsService {
             log.info("Account {} deleted", tempoServerAccountDto.getKey());
         }
 
-        // Serveri accountide migratsioon pilvest serverisse
+        // Tempo account migration
         TempoCloudAccountDto tempoCloudAccountsDto = tempoCloudConnector.getTempoCloudAccounts();
         if (tempoCloudAccountsDto.getResults() != null) {
             for (CloudAccountResultsDto tempoCloudAccountDto : tempoCloudAccountsDto.getResults()) {
                 ServerAccountDto tempoServerAccountDto = new ServerAccountDto();
                 BeanUtils.copyProperties(tempoCloudAccountDto, tempoServerAccountDto);
 
-                // Account lead migratsioon
+                // Tempo account lead migration
                 String cloudAccountLeadDisplayName = tempoCloudAccountDto.getCloudAccountResultsLeadDto().getDisplayName();
                 String serverAccountLeadKey = tempoServiceUtil.getJiraServerUserKey(cloudAccountLeadDisplayName);
                 JiraServerUserDto serverAccountLeadDto = new JiraServerUserDto();
@@ -58,12 +58,11 @@ public class TempoAccountsService {
                 serverAccountLeadDto.setKey(serverAccountLeadKey);
                 tempoServerAccountDto.setJiraServerLead(serverAccountLeadDto);
 
-                // Account contact migratsioon
+                // Tempo account contact migration
                 String cloudContactDisplayName = "";
                 String serverContactUserKey = "";
                 if (tempoCloudAccountDto != null && tempoCloudAccountDto.getCloudAccountResultsContactDto() != null) {
                     cloudContactDisplayName = tempoCloudAccountDto.getCloudAccountResultsContactDto().getDisplayName();
-                    //serverContactUserKey = jiraServerUserKey(cloudContactDisplayName);
                     serverContactUserKey = tempoServiceUtil.getJiraServerUserKey(cloudContactDisplayName);
                 }
                 JiraServerUserDto serverAccountContactDto = new JiraServerUserDto();
@@ -87,7 +86,7 @@ public class TempoAccountsService {
                 ServerAccountInsertResponseDto tempoServerAccount = tempoServerConnector.insertTempoServerAccount(tempoServerAccountDto);
                 log.info("Account {} created.", tempoServerAccountDto.getKey());
 
-                // Account links migratsioon
+                // Tempo account links migration
                 String tempoCloudLinksApi = tempoCloudAccountDto.getCloudAccountResultsLinksDto().getSelf();
                 CloudLinksDto tempoCloudLinksDto = tempoCloudConnector.getTempoCloudAccountLinks(tempoCloudLinksApi);
 

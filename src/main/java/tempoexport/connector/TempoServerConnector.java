@@ -125,7 +125,7 @@ public class TempoServerConnector {
                     HttpMethod.POST, getEntityMember(insertTeamMember), ServerTeamMemberInsertResponseDto.class, id);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
+            //log.error("Status Code exception {}", sce);
             if (sce.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 return null;
             }
@@ -137,17 +137,6 @@ public class TempoServerConnector {
         try {
             restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/2/team/{id}", HttpMethod.DELETE, getEntity(), void.class, teamId);
         } catch (HttpStatusCodeException sce) {
-            throw new RuntimeException("Status code exception ", sce);
-        }
-    }
-
-    public ServerAccountLinksDto insertServerTeamLinks(ServerAccountLinksDto insertLinksDto) {
-        try {
-            ResponseEntity<ServerAccountLinksDto> usage = restTemplate.exchange(tempoServerUrl + "/rest/tempo-teams/1/link",
-                    HttpMethod.POST, getEntityLinks(insertLinksDto), ServerAccountLinksDto.class);
-            return usage.getBody();
-        } catch (HttpStatusCodeException sce) {
-            log.error("Status Code exception {}", sce);
             throw new RuntimeException("Status code exception ", sce);
         }
     }
