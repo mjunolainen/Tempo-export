@@ -24,8 +24,11 @@ public class TempoAccountsService {
     private TempoServiceUtil tempoServiceUtil;
 
     public void migrateTempoAccounts() {
+        log.info("midagi");
 
         TempoServerAccountDto[] tempoServerAccounts = tempoServerConnector.getTempoServerAccounts();
+        log.info("T: {}", tempoServerAccounts.length);
+
         for (int i = 0; i < tempoServerAccounts.length; i++) {
             TempoServerAccountDto tempoServerAccountDto = tempoServerAccounts[i];
             ServerAccountLinksDto[] tempoServerAccountLinks = tempoServerConnector.getTempoServerSingleAccountLinks(tempoServerAccountDto.getId());
