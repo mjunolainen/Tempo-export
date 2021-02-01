@@ -7,10 +7,8 @@ import org.springframework.web.client.RestTemplate;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLContext;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -21,11 +19,10 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 @Configuration
 public class AppConfig {
 
- /*   @Bean
+    /*@Bean
     public RestTemplate restTemplate(){
         return new RestTemplate();
     }*/
-
 
     @Bean
     public RestTemplate restTemplate()
