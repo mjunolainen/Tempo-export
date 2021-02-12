@@ -9,7 +9,9 @@ import tempoexport.connector.TempoCloudConnector;
 import tempoexport.connector.TempoServerConnector;
 import tempoexport.dto.cloud.worklog.CloudWorklogDto;
 import tempoexport.dto.cloud.worklog.CloudWorklogsListDto;
-import tempoexport.dto.server.worklog.*;
+import tempoexport.dto.server.worklog.ServerWorklogDto;
+import tempoexport.dto.server.worklog.TempoServerReturnWorklogDto;
+import tempoexport.dto.server.worklog.TempoServerWorklogRequestDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -88,7 +90,7 @@ public class TempoWorklogService {
         while (cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getNext() != null) {
             worklogCountFromCloud = worklogCountFromCloud + cloudWorklogsListDto.getCloudWorklogsMetaDataDto().getCount();
 
-           for (CloudWorklogDto cloudWorklogDto : cloudWorklogsListDto.getResults()) {
+            for (CloudWorklogDto cloudWorklogDto : cloudWorklogsListDto.getResults()) {
                 ServerWorklogDto serverWorklogDto = new ServerWorklogDto();
 
                 serverWorklogDto.setBillableSeconds(cloudWorklogDto.getBillableSeconds());
