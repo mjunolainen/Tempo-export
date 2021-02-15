@@ -17,18 +17,14 @@ public class TempoExportController {
     private TempoWorklogService tempoWorklogService;
 
     @GetMapping("migrateTempoAccounts")
-    public void getMigrateTempoAccounts() { tempoAccountsService.migrateTempoAccounts(); }
+    public String getMigrateTempoAccounts() {return tempoAccountsService.migrateTempoAccounts(); }
 
     @GetMapping("migrateTempoTeams")
-    public void migrateTempoTeams() {tempoTeamsService.migrateTempoTeams(); }
+    public String migrateTempoTeams() {return tempoTeamsService.migrateTempoTeams(); }
 
-    @GetMapping("migrateTempoWorklogs")
-    public void migrateTempoWorklogs() {tempoWorklogService.migrateTempoWorklogs(); }
-
-    //
     @GetMapping("deleteTempoServerWorklogs")
-    public void getTempoServerWorklogs() {tempoWorklogService.deleteTempoServerWorklogs(); }
+    public String getTempoServerWorklogs() {return tempoWorklogService.deleteTempoServerWorklogs(); }
 
     @GetMapping("migrateWorklogs")
-    public void migrateWorklogs() {tempoWorklogService.migrateWorklogs(); }
+    public String migrateWorklogs() {return tempoWorklogService.migrateWorklogs(); }
 }

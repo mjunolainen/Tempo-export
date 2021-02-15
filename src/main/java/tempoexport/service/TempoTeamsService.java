@@ -25,7 +25,7 @@ public class TempoTeamsService {
     @Autowired
     private TempoServiceUtil tempoServiceUtil;
 
-    public void migrateTempoTeams() {
+    public String migrateTempoTeams() {
 
         ServerTeamDto[] tempoServerTeams = tempoServerConnector.getTempoServerTeams();
         for (int i = 0; i < tempoServerTeams.length; i++) {
@@ -33,7 +33,7 @@ public class TempoTeamsService {
             tempoServerConnector.deleteTempoServerTeams(dtoTeam.getId());
             log.info("Team {} deleted", dtoTeam.getName());
         }
-        // Teami migratsiooni pilvest serverisse
+        // Tempo team migration
         CloudTeamsListDto tempoCloudTeamsListDto = tempoCloudConnector.getTempoCloudTeams();
         if (tempoCloudTeamsListDto.getResults() != null) {
             for (CloudTeamDto tempoCloudTeamDto : tempoCloudTeamsListDto.getResults()) {
@@ -98,7 +98,6 @@ public class TempoTeamsService {
                         tempoServerTeamMemberMembershipDto.setServerTeamMemberRoleDto(tempoServerTeamMemberRoleDto);
                         tempoServerTeamMemberDto.setServerTeamMemberMembershipDto(tempoServerTeamMemberMembershipDto);
 
-                        log.info(tempoServerTeamMemberDto.toString());
                         log.info("Name {}", tempoServerTeamMemberDto.getServerTeamMemberNameDto().getName());
                         if (tempoServerTeamMemberDto.getServerTeamMemberNameDto().getName() != null) {
                             ServerTeamMemberInsertResponseDto tempoServerTeamMemeber = tempoServerConnector.insertTempoServerTeamMember
@@ -110,5 +109,6 @@ public class TempoTeamsService {
                 }
             }
         }
+        return "Teams migrated";
     }
 }
