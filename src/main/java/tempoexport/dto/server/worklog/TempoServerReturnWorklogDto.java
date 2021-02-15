@@ -2,7 +2,6 @@ package tempoexport.dto.server.worklog;
 
 import lombok.Data;
 
-
 @Data
 public class TempoServerReturnWorklogDto {
     Integer billableSeconds;

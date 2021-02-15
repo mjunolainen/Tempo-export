@@ -9,6 +9,4 @@ public class CloudLinksResultsDto {
     Integer id;
     @JsonProperty("scope")
     CloudLinksScopeDto cloudLinksScopeDto;
-    //@JsonProperty("account")
-    //CloudAccountResultsLinksDto cloudAccountLinksAccountDto;
 }
