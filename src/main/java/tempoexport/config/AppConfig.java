@@ -15,7 +15,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
-
 @Configuration
 public class AppConfig {
     @Bean

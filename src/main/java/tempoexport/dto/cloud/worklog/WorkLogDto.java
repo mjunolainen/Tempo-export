@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class WorkLogDto {
-
     @JsonProperty("metadata")
     CloudWorklogsMetaDataDto metaData;
     String self;

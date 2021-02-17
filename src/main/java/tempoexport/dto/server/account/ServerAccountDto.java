@@ -7,7 +7,6 @@ import tempoexport.dto.server.user.JiraServerUserDto;
 
 @Data
 public class ServerAccountDto {
-
     @JsonProperty("contact")
     JiraServerUserDto jiraServerContact;
     @JsonProperty("customer")

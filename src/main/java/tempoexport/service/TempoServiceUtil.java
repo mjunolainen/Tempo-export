@@ -49,12 +49,4 @@ public class TempoServiceUtil {
             return jiraUserServerMap;
         }
     }
-
-   /* public String getJiraServerUserEmail(String cloudDisplayName) {
-        String serverUserEmail = null;
-        if (getJiraServerUserMap().containsKey(cloudDisplayName)) {
-            serverUserEmail = getJiraServerUserMap().get(cloudDisplayName).getEmailAddress();
-        }
-        return serverUserEmail;
-    }*/
 }

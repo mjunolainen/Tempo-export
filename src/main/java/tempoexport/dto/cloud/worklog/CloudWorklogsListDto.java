@@ -2,7 +2,6 @@ package tempoexport.dto.cloud.worklog;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
 import java.util.List;
 
 @Data

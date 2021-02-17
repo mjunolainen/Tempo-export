@@ -125,7 +125,6 @@ public class TempoServerConnector {
                     HttpMethod.POST, getEntityMember(insertTeamMember), ServerTeamMemberInsertResponseDto.class, id);
             return usage.getBody();
         } catch (HttpStatusCodeException sce) {
-            //log.error("Status Code exception {}", sce);
             if (sce.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 return null;
             }

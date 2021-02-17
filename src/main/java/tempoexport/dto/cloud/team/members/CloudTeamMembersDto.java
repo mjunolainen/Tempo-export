@@ -3,7 +3,6 @@ package tempoexport.dto.cloud.team.members;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import tempoexport.dto.cloud.account.CloudMetaDataDto;
-
 import java.util.List;
 
 @Data

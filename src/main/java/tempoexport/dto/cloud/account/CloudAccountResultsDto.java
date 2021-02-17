@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class CloudAccountResultsDto {
-
     String self;
     String key;
     int id;
@@ -20,5 +19,4 @@ public class CloudAccountResultsDto {
     CloudAccountResultsContactDto cloudAccountResultsContactDto;
     @JsonProperty("links")
     CloudAccountResultsLinksDto cloudAccountResultsLinksDto;
-
 }
